@@ -1,4 +1,4 @@
-import { DUR } from '../utils/constants'
+import { DUR, PRIMARY_COLOR } from '../utils/constants'
 
 export function Menu(props: {
   onStart: () => void
@@ -6,12 +6,15 @@ export function Menu(props: {
   fade: boolean
 }) {
   return (
-    <div className="flex justify-center items-center h-screen text-white">
+    <div
+      className="flex justify-center items-center h-screen text-white"
+      style={{ backgroundColor: PRIMARY_COLOR }}
+    >
       <div
         className="transition-all inset-0 fixed z-20"
         style={{
           transitionDuration: `${DUR}ms`,
-          backgroundColor: props.fade ? '#00001c' : 'transparent',
+          backgroundColor: props.fade ? PRIMARY_COLOR : 'transparent',
           pointerEvents: props.fade ? 'auto' : 'none',
         }}
       />

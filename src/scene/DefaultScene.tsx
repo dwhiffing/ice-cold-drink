@@ -5,7 +5,7 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import { Plane } from '../prefabs/Plane'
 import { Player } from '../prefabs/Player'
 import { useMouseInput } from '../hooks/useMouseInput'
-import { DEBUG, FOG_DISTANCE } from '../utils/constants'
+import { DEBUG, FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
 
 extend({ PointerLockControls })
@@ -37,15 +37,15 @@ export const DefaultScene = () => {
 
   return (
     <>
-      <fog attach="fog" args={['#557582', 1, FOG_DISTANCE]} />
-      <color attach="background" args={['#557582']} />
+      <fog attach="fog" args={[PRIMARY_COLOR, 1, FOG_DISTANCE]} />
+      <color attach="background" args={[PRIMARY_COLOR]} />
       <directionalLight
         color="#ffffff"
         position={[0, 10, 10]}
         intensity={0.6}
       />
 
-      <ambientLight color="#557582" intensity={2} />
+      <ambientLight color={PRIMARY_COLOR} intensity={2} />
       <Physics
         gravity={[0, -1.7, 0]}
         tolerance={0}

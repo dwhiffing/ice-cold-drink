@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { UI } from './components/UI'
 import { DefaultScene } from './scene/DefaultScene'
 import { useEffect, useState } from 'react'
-import { DEBUG, DUR } from './utils/constants'
+import { DEBUG, DUR, PRIMARY_COLOR } from './utils/constants'
 import { clickSound, playSound, toggleMute } from './utils/audio'
 import { Menu } from './scene/Menu'
 
@@ -56,7 +56,7 @@ export default function App() {
         <div
           className="transition-all inset-0 fixed z-20"
           style={{
-            backgroundColor: gameFade ? 'transparent' : '#00001c',
+            backgroundColor: gameFade ? 'transparent' : PRIMARY_COLOR,
             transitionDuration: `${gameFade ? DUR : DUR / 2}ms`,
           }}
         />

@@ -8,6 +8,7 @@ import { Object3D } from 'three'
 import vertexShader from '../glsl/reflector.vert'
 // @ts-expect-error glslify
 import fragmentShader from '../glsl/reflector.frag'
+import { PRIMARY_COLOR } from '../utils/constants'
 
 extend({ PlaneGeometry })
 export const Plane = () => {
@@ -50,7 +51,7 @@ export const Plane = () => {
 
     const reflector = new Reflector(geo, {
       shader: customShader,
-      color: '#557582',
+      color: PRIMARY_COLOR,
       textureWidth: 1024,
       textureHeight: 1024,
       clipBias: 0.003,
