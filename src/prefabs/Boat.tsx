@@ -21,8 +21,8 @@ export const Boat = ({
   return (
     <Float
       speed={5}
-      rotationIntensity={0.05}
-      floatIntensity={0.01}
+      rotationIntensity={0.1}
+      floatIntensity={0.05}
       floatingRange={[-1.5, 0]}
     >
       <mesh

@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Physics } from '@react-three/cannon'
-import { Plane } from '../prefabs/Plane'
-import { FOG_DISTANCE, PLAYER, PRIMARY_COLOR } from '../utils/constants'
+import { Water } from '../prefabs/Water'
+import { FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
-import { Player } from '../prefabs/Player'
 import { CameraControls } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useThree } from '@react-three/fiber'
 import { Islands } from '../prefabs/Islands'
 
+const LOOK_OVERHEAD = false
 
 export const DefaultScene = () => {
   const { controls } = useThree()
@@ -15,8 +14,8 @@ export const DefaultScene = () => {
 
   useEffect(() => {
     const _controls = controls as CameraControls
-    const distanceBehind = 5
-    const cameraHeight = 1
+    const distanceBehind = LOOK_OVERHEAD ? 0 : 5
+    const cameraHeight = LOOK_OVERHEAD ? 100 : 1
     const angleBehind = boatPos.angle - Math.PI / 2
     const behindX = boatPos.x - distanceBehind * Math.sin(angleBehind)
     const behindZ = boatPos.y - distanceBehind * Math.cos(angleBehind)
@@ -31,10 +30,6 @@ export const DefaultScene = () => {
     )
   }, [boatPos, controls])
 
-  // useFrame(() => {
-  //   setBoatPos((prev) => ({ ...prev, angle: prev.angle + 0 }))
-  // })
-
   return (
     <>
       <fog attach="fog" args={[PRIMARY_COLOR, 1, FOG_DISTANCE]} />
@@ -46,16 +41,8 @@ export const DefaultScene = () => {
       />
 
       <ambientLight color={PRIMARY_COLOR} intensity={2} />
-      <Physics
-        gravity={[0, -1.7, 0]}
-        tolerance={0}
-        iterations={10}
-        broadphase={'SAP'}
-      >
-        {PLAYER && <Player />}
-        <Plane />
-      </Physics>
 
+      <Water />
       <Islands />
       <Boat x={boatPos.x} y={boatPos.y} angle={boatPos.angle} />
       <CameraControls
