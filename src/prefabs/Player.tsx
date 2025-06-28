@@ -1,16 +1,19 @@
 import { useSphere } from '@react-three/cannon'
 import { useEffect, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { extend, useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import { useKeyboardInput } from '../hooks/useKeyboardInput'
 import { useVariable } from '../hooks/useVariable'
 import { jumpSound, playSound } from '../utils/audio'
 import { useRefreshRate } from '../hooks/useRefreshRate'
+import { PointerLockControls } from 'three/examples/jsm/Addons.js'
+import { DEBUG } from '../utils/constants'
 
 /** Player movement constants */
 const _speed = 10
 const jumpSpeed = 0.75
 
+extend({ PointerLockControls })
 export const Player = () => {
   const x = 3 * 0.4 + 2
   const y = -1.46
@@ -24,6 +27,18 @@ export const Player = () => {
     args: [0.02],
     material: { friction: 0, restitution: 0 },
   }))
+
+  const controls = useRef<PointerLockControls>(null)
+
+  // pointer lock
+  useEffect(() => {
+    const handleFocus = () => controls.current?.lock()
+    if (!DEBUG) controls.current?.lock()
+    document.addEventListener('click', handleFocus)
+    return () => {
+      document.removeEventListener('click', handleFocus)
+    }
+  }, [])
 
   const pressed = useKeyboardInput([
     'w',
@@ -40,7 +55,7 @@ export const Player = () => {
   ])
   const input = useVariable(pressed)
 
-  const { camera } = useThree()
+  const { camera, gl } = useThree()
 
   const state = useRef({
     vel: [0, 0, 0],
@@ -126,5 +141,10 @@ export const Player = () => {
     }
   })
 
-  return <></>
+  return (
+    <>
+      {/* @ts-expect-error pointer lock */}
+      <pointerLockControls ref={controls} args={[camera, gl.domElement]} />
+    </>
+  )
 }

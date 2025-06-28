@@ -1,40 +1,38 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { Physics } from '@react-three/cannon'
-import { extend, useThree } from '@react-three/fiber'
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'
 import { Plane } from '../prefabs/Plane'
-import { Player } from '../prefabs/Player'
-import { useMouseInput } from '../hooks/useMouseInput'
-import { DEBUG, FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
+import { FOG_DISTANCE, PLAYER, PRIMARY_COLOR } from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
 import Island from '../prefabs/Island'
-
-extend({ PointerLockControls })
+import { Player } from '../prefabs/Player'
+import { CameraControls } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
 
 export const DefaultScene = () => {
-  const { camera, gl } = useThree()
-  const controls = useRef<PointerLockControls>(null)
+  const { controls } = useThree()
+  const [boatPos, setBoatPos] = useState({ x: 2, y: 2, angle: Math.PI * 0.5 })
 
-  // pointer lock
   useEffect(() => {
-    const handleFocus = () => controls.current?.lock()
-    if (!DEBUG) controls.current?.lock()
-    document.addEventListener('click', handleFocus)
-    return () => {
-      document.removeEventListener('click', handleFocus)
-    }
-  }, [])
+    const _controls = controls as CameraControls
+    const distanceBehind = 5
+    const cameraHeight = 1
+    const angleBehind = boatPos.angle - Math.PI / 2
+    const behindX = boatPos.x - distanceBehind * Math.sin(angleBehind)
+    const behindZ = boatPos.y - distanceBehind * Math.cos(angleBehind)
+    _controls?.setLookAt(
+      behindX,
+      cameraHeight,
+      behindZ,
+      boatPos.x,
+      0,
+      boatPos.y,
+      true,
+    )
+  }, [boatPos, controls])
 
-  useMouseInput(
-    // on down
-    () => {},
-    // on up
-    () => {},
-    // on move
-    () => {},
-  )
-
-  // useFrame(() => {})
+  // useFrame(() => {
+  //   setBoatPos((prev) => ({ ...prev, angle: prev.angle + 0 }))
+  // })
 
   return (
     <>
@@ -53,14 +51,18 @@ export const DefaultScene = () => {
         iterations={10}
         broadphase={'SAP'}
       >
-        <Player />
+        {PLAYER && <Player />}
         <Plane />
-        <Island />
       </Physics>
-      <Boat position={[2, 0, 2]} />
 
-      {/* @ts-expect-error pointer lock */}
-      <pointerLockControls ref={controls} args={[camera, gl.domElement]} />
+      <Island />
+      <Boat x={boatPos.x} y={boatPos.y} angle={boatPos.angle} />
+      <CameraControls
+        makeDefault
+        // mouseButtons={{ left: 0, middle: 0, right: 0, wheel: 0 }}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI / 2}
+      />
     </>
   )
 }

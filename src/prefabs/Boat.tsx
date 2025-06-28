@@ -3,7 +3,15 @@ import { useLoader } from '@react-three/fiber'
 
 import { MTLLoader, OBJLoader } from 'three/examples/jsm/Addons.js'
 
-export const Boat = ({ position }: { position: number[] }) => {
+export const Boat = ({
+  x,
+  y,
+  angle,
+}: {
+  x: number
+  y: number
+  angle: number
+}) => {
   const materials = useLoader(MTLLoader, 'boat/boat.mtl')
   const obj = useLoader(OBJLoader, 'boat/boat.obj', (loader) => {
     materials.preload()
@@ -18,8 +26,8 @@ export const Boat = ({ position }: { position: number[] }) => {
       floatingRange={[-1.5, 0]}
     >
       <mesh
-        position={[position[0], position[1] - 2.05, position[2]]}
-        rotation={[-Math.PI / 2, 0, 0]}
+        position={[x, -2.05, y]}
+        rotation={[-Math.PI / 2, 0, angle]}
         scale={0.003}
       >
         <primitive object={obj} />
