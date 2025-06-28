@@ -101,20 +101,22 @@ export const FakeGlowMaterial = ({
       side={side}
       transparent={true}
       blending={AdditiveBlending}
-      depthTest={false}
+      depthTest={true}
     />
   )
 }
 
-export const PulsingLight = (props: { color: string }) => {
+export const PulsingLight = (props: {
+  color: string
+  position: [number, number, number]
+}) => {
   return (
-    <mesh position={[0, 0, 0]}>
-      <sphereGeometry args={[0.2, 16, 16]} />
-      <meshStandardMaterial />
+    <mesh position={props.position}>
+      <sphereGeometry args={[1, 16, 16]} />
       <FakeGlowMaterial
-        glowColor={props.color}
-        glowInternalRadius={4}
-        falloff={2}
+        glowColor="#ff0000"
+        glowInternalRadius={2}
+        falloff={1}
       />
     </mesh>
   )
