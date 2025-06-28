@@ -1,34 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { Water } from '../prefabs/Water'
 import { FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
 import { CameraControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { Islands } from '../prefabs/Islands'
-
-const LOOK_OVERHEAD = false
+import { useGameStore } from '../store/gameStore'
 
 export const DefaultScene = () => {
   const { controls } = useThree()
-  const [boatPos, setBoatPos] = useState({ x: 2, y: 2, angle: Math.PI * 0.5 })
+  const boatPos = useGameStore((s) => s.boatState)
+
+  const updateCamera = useCallback(() => {
+    const _controls = controls as CameraControls
+    const angleBehind = boatPos.angle - Math.PI / 2
+    const behindX = boatPos.x - 9 * Math.sin(angleBehind)
+    const behindZ = boatPos.y - 9 * Math.cos(angleBehind)
+    _controls?.setPosition(behindX, 1, behindZ, true)
+  }, [boatPos, controls])
 
   useEffect(() => {
     const _controls = controls as CameraControls
-    const distanceBehind = LOOK_OVERHEAD ? 0 : 5
-    const cameraHeight = LOOK_OVERHEAD ? 100 : 1
-    const angleBehind = boatPos.angle - Math.PI / 2
-    const behindX = boatPos.x - distanceBehind * Math.sin(angleBehind)
-    const behindZ = boatPos.y - distanceBehind * Math.cos(angleBehind)
-    _controls?.setLookAt(
-      behindX,
-      cameraHeight,
-      behindZ,
-      boatPos.x,
-      0,
-      boatPos.y,
-      true,
-    )
-  }, [boatPos, controls])
+    _controls?.setOrbitPoint(boatPos.x, 0, boatPos.y)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [controls])
+
+  useEffect(() => {
+    updateCamera()
+  }, [updateCamera])
 
   return (
     <>
@@ -47,9 +46,11 @@ export const DefaultScene = () => {
       <Boat x={boatPos.x} y={boatPos.y} angle={boatPos.angle} />
       <CameraControls
         makeDefault
-        // mouseButtons={{ left: 0, middle: 0, right: 0, wheel: 0 }}
+        mouseButtons={{ left: 1, middle: 16, right: 0, wheel: 16 }}
         minPolarAngle={0}
         maxPolarAngle={Math.PI / 2}
+        maxDistance={15}
+        minDistance={5}
       />
     </>
   )

@@ -12,6 +12,8 @@ export function Island({
   size,
   noise,
   curve,
+  dockingPoint = { dx: -3, dy: 0 },
+  showDockingPoint = false,
 }: {
   x?: number
   y?: number
@@ -20,6 +22,8 @@ export function Island({
   size?: number
   noise?: number
   curve?: number
+  dockingPoint?: { dx: number; dy: number }
+  showDockingPoint?: boolean
 }) {
   const { geometry, material } = useMemo(() => {
     const map = crusoe.generateMap({
@@ -60,12 +64,19 @@ export function Island({
   }, [elevation, size, noise, curve, seed])
 
   return (
-    <mesh
-      geometry={geometry}
-      material={material}
-      position={[x ?? 0, 0, y ?? 0]}
-      rotation={[-Math.PI / 2, 0, 0]}
-      scale={[2, 2, 2]}
-    />
+    <group position={[x ?? 0, 0, y ?? 0]}>
+      <mesh
+        geometry={geometry}
+        material={material}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[2, 2, 2]}
+      />
+      {showDockingPoint && (
+        <mesh position={[dockingPoint.dx, -1.5, dockingPoint.dy]}>
+          <sphereGeometry args={[1, 16, 16]} />
+          <meshStandardMaterial color="yellow" />
+        </mesh>
+      )}
+    </group>
   )
 }
