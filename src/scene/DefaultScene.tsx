@@ -7,6 +7,7 @@ import { Player } from '../prefabs/Player'
 import { useMouseInput } from '../hooks/useMouseInput'
 import { DEBUG, FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
+import Island from '../prefabs/Island'
 
 extend({ PointerLockControls })
 
@@ -54,6 +55,7 @@ export const DefaultScene = () => {
       >
         <Player />
         <Plane />
+        <Island />
       </Physics>
       <Boat position={[0, 0, 0]} />
 

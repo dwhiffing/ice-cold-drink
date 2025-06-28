@@ -11,7 +11,7 @@ export const Boat = ({ position }: { position: number[] }) => {
 
   return (
     <mesh
-      position={[position[0], position[1] - 1.9, position[2]]}
+      position={[position[0], position[1] - 2.05, position[2]]}
       rotation={[-Math.PI / 2, 0, 0]}
       scale={0.003}
     >
