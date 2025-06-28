@@ -57,7 +57,7 @@ export const DefaultScene = () => {
         <Plane />
         <Island />
       </Physics>
-      <Boat position={[0, 0, 0]} />
+      <Boat position={[2, 0, 2]} />
 
       {/* @ts-expect-error pointer lock */}
       <pointerLockControls ref={controls} args={[camera, gl.domElement]} />
