@@ -6,28 +6,32 @@ import { CameraControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { Islands } from '../prefabs/Islands'
 import { useGameStore } from '../store/gameStore'
+import { useKeyboardInput } from '../hooks/useKeyboardInput'
 
 export const DefaultScene = () => {
   const { controls } = useThree()
   const boatPos = useGameStore((s) => s.boatState)
+  const moveBoatToNextDock = useGameStore((s) => s.moveBoatToNextDock)
+  const moveBoatToPrevDock = useGameStore((s) => s.moveBoatToPrevDock)
+  const keys = useKeyboardInput(['ArrowLeft', 'ArrowRight'])
 
   const updateCamera = useCallback(() => {
     const _controls = controls as CameraControls
     const angleBehind = boatPos.angle - Math.PI / 2
     const behindX = boatPos.x - 9 * Math.sin(angleBehind)
     const behindZ = boatPos.y - 9 * Math.cos(angleBehind)
-    _controls?.setPosition(behindX, 1, behindZ, true)
+    _controls?.setLookAt(behindX, 1, behindZ, boatPos.x, 0, boatPos.y, true)
   }, [boatPos, controls])
-
-  useEffect(() => {
-    const _controls = controls as CameraControls
-    _controls?.setOrbitPoint(boatPos.x, 0, boatPos.y)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [controls])
 
   useEffect(() => {
     updateCamera()
   }, [updateCamera])
+
+  useEffect(() => {
+    if (keys.arrowright) moveBoatToNextDock()
+    if (keys.arrowleft) moveBoatToPrevDock()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keys.arrowright, keys.arrowleft])
 
   return (
     <>

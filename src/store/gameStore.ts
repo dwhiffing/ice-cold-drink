@@ -29,7 +29,7 @@ function generateIslands({
   maxTries: number
 }) {
   const rand = mulberry32(seed)
-  const positions: [number, number][] = []
+  const islands: IslandData[] = []
   for (let i = 0; i < count; i++) {
     let tries = 0
     let ix = 0,
@@ -38,14 +38,35 @@ function generateIslands({
     while (tries < maxTries && !ok) {
       ix = (rand() - 0.5) * spread
       iy = (rand() - 0.5) * spread
-      ok = positions.every(([px, py]) => distance([ix, iy], [px, py]) >= buffer)
+      ok = islands.every(({ x, y }) => distance([ix, iy], [x, y]) >= buffer)
       tries++
     }
     if (ok) {
-      positions.push([ix, iy])
+      islands.push({
+        x: ix,
+        y: iy,
+        seed: 0,
+        // seed: i,
+        elevation: 1,
+        size: 1.3,
+        noise: 9,
+        curve: 1.1,
+        dockingPoint: { dx: -3, dy: 0 },
+      })
     }
   }
-  return positions
+  return islands
+}
+
+export interface IslandData {
+  x: number
+  y: number
+  seed: number
+  elevation: number
+  size: number
+  noise: number
+  curve: number
+  dockingPoint: { dx: number; dy: number }
 }
 
 export interface GameState {
@@ -57,19 +78,30 @@ export interface GameState {
   maxTries: number
   drawDistance: number
   showDockingPoints: boolean
-  positions: [number, number][]
+  islands: IslandData[]
+  currentDockingIndex: number
+  moveBoatToDock: (index: number) => void
+  moveBoatToNextDock: () => void
+  moveBoatToPrevDock: () => void
 }
 
-export const useGameStore = create<GameState>(() => {
+export const useGameStore = create<GameState>((set, get) => {
   const count = 50
   const seed = 12345
   const spread = 2000
   const buffer = 240
   const maxTries = 1000
   const drawDistance = 500
+  const islands = generateIslands({ count, seed, spread, buffer, maxTries })
+  // Boat starts at first docking point
+  const initialBoat = {
+    x: islands[0].x + islands[0].dockingPoint.dx,
+    y: islands[0].y + islands[0].dockingPoint.dy,
+    angle: Math.PI * 0.5,
+  }
 
   return {
-    boatState: { x: 0, y: 0, angle: Math.PI * 0.5 },
+    boatState: initialBoat,
     count,
     seed,
     spread,
@@ -77,6 +109,29 @@ export const useGameStore = create<GameState>(() => {
     maxTries,
     drawDistance,
     showDockingPoints: true,
-    positions: generateIslands({ count, seed, spread, buffer, maxTries }),
+    islands,
+    currentDockingIndex: 0,
+    moveBoatToDock: (index: number) => {
+      const island = get().islands[index]
+      if (!island) return
+      set({
+        boatState: {
+          x: island.x + island.dockingPoint.dx,
+          y: island.y + island.dockingPoint.dy,
+          angle: Math.PI * 0.5,
+        },
+        currentDockingIndex: index,
+      })
+    },
+    moveBoatToNextDock: () => {
+      const { currentDockingIndex, islands } = get()
+      const next = (currentDockingIndex + 1) % islands.length
+      get().moveBoatToDock(next)
+    },
+    moveBoatToPrevDock: () => {
+      const { currentDockingIndex, islands } = get()
+      const prev = (currentDockingIndex - 1 + islands.length) % islands.length
+      get().moveBoatToDock(prev)
+    },
   }
 })

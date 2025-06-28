@@ -19,19 +19,21 @@ export const Boat = ({
   })
 
   return (
-    <Float
-      speed={5}
-      rotationIntensity={0.1}
-      floatIntensity={0.05}
-      floatingRange={[-1.5, 0]}
+    <group
+      position={[x, -2.05, y]}
+      rotation={[-Math.PI / 2, 0, angle]}
+      scale={0.003}
     >
-      <mesh
-        position={[x, -2.05, y]}
-        rotation={[-Math.PI / 2, 0, angle]}
-        scale={0.003}
+      <Float
+        speed={5}
+        rotationIntensity={0.1}
+        floatIntensity={0.05}
+        floatingRange={[-1.5, 0]}
       >
-        <primitive object={obj} />
-      </mesh>
-    </Float>
+        <mesh>
+          <primitive object={obj} />
+        </mesh>
+      </Float>
+    </group>
   )
 }

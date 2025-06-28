@@ -4,19 +4,24 @@ import { useGameStore } from '../store/gameStore'
 import React from 'react'
 
 export function Islands() {
-  const { positions, seed, showDockingPoints } = useGameStore()
+  const { islands, showDockingPoints } = useGameStore()
 
-  const islands = positions.map(([x, y], i) => (
+  const islandEls = islands.map((island, i) => (
     <React.Fragment key={i}>
       <Island
         key={i}
-        x={x}
-        y={y}
-        seed={seed + i}
+        x={island.x}
+        y={island.y}
+        seed={island.seed}
+        elevation={island.elevation}
+        size={island.size}
+        noise={island.noise}
+        curve={island.curve}
+        dockingPoint={island.dockingPoint}
         showDockingPoint={showDockingPoints}
       />
-      <Lighthouse x={x} y={y} />
+      <Lighthouse x={island.x} y={island.y} />
     </React.Fragment>
   ))
-  return <>{islands}</>
+  return <>{islandEls}</>
 }
