@@ -3,10 +3,11 @@ import { Physics } from '@react-three/cannon'
 import { Plane } from '../prefabs/Plane'
 import { FOG_DISTANCE, PLAYER, PRIMARY_COLOR } from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
-import Island from '../prefabs/Island'
 import { Player } from '../prefabs/Player'
 import { CameraControls } from '@react-three/drei'
-import { useThree } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
+import { Islands } from '../prefabs/Islands'
+
 
 export const DefaultScene = () => {
   const { controls } = useThree()
@@ -55,7 +56,7 @@ export const DefaultScene = () => {
         <Plane />
       </Physics>
 
-      <Island />
+      <Islands />
       <Boat x={boatPos.x} y={boatPos.y} angle={boatPos.angle} />
       <CameraControls
         makeDefault
