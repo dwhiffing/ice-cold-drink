@@ -359,8 +359,14 @@ export const useGameStore = create<GameState>((set, get) => {
     setBoatState: (state) => {
       const prev = get().boatState
       const dist = distance([prev.x, prev.y], [state.x, state.y])
-      let fuelDistanceTraveled = get().fuelDistanceTraveled + dist
       let inventory = get().inventory
+      const totalItems = inventory
+        .filter((item) => item.name !== 'money')
+        .reduce((sum, item) => sum + item.value, 0)
+      const usageFraction = Math.min(1, totalItems / 100)
+      const fuelMultiplier = 4 * usageFraction
+      let fuelDistanceTraveled =
+        get().fuelDistanceTraveled + dist * fuelMultiplier
       let fuelUsed = 0
       while (fuelDistanceTraveled >= FUEL_UNIT_DISTANCE) {
         fuelDistanceTraveled -= FUEL_UNIT_DISTANCE
