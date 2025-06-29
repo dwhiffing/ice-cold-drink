@@ -317,9 +317,7 @@ export const useGameStore = create<GameState>((set, get) => {
   }
 
   function getFuelPrice(moveCount: number): number {
-    return Math.round(
-      10 + 2 * moveCount + Math.pow(Math.max(0, moveCount - 10), 2),
-    )
+    return Math.round(5 + Math.pow(Math.max(0, moveCount), 2))
   }
 
   return {
