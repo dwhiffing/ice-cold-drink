@@ -34,8 +34,10 @@ export const DebugTransform: React.FC<DebugTransformProps> = ({
         showX={showX}
         showY={showY}
         showZ={showZ}
+        // @ts-expect-error yes
         onMouseUp={onMouseUp}
       >
+        {/* @ts-expect-error yes */}
         {children}
       </TransformControls>
     )

@@ -3,7 +3,6 @@ import { UI } from './components/UI'
 import { DefaultScene } from './scene/DefaultScene'
 import { useEffect, useState } from 'react'
 import { DUR, PRIMARY_COLOR } from './utils/constants'
-import { clickSound, playSound, toggleMute } from './utils/audio'
 import { Menu } from './scene/Menu'
 import { useGameStore } from './store/gameStore'
 
@@ -41,7 +40,7 @@ export default function App() {
       const lowerKey = e.key.toLowerCase()
       if (lowerKey === 'm') {
         e.preventDefault()
-        toggleMute()
+        // toggleMute()
       }
     }
 
@@ -54,7 +53,6 @@ export default function App() {
 
   const onStart = () => {
     setMenuFade(true)
-    playSound(clickSound, 0.9, 1.1, 0.35)
     setTimeout(() => setGameStarted(true), DUR)
   }
 
@@ -77,7 +75,6 @@ export default function App() {
     <Menu
       fade={menuFade}
       onStart={() => {
-        playSound(clickSound, 0.9, 1.1, 0.35)
         onStart()
       }}
     />
