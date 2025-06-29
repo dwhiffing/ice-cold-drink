@@ -164,7 +164,6 @@ export interface GameState {
   buffer: number
   maxTries: number
   drawDistance: number
-  showDockingPoints: boolean
   islands: IslandData[]
   currentDockingIndex: number
   bezierPath: {
@@ -218,15 +217,14 @@ export const useGameStore = create<GameState>((set, get) => {
     buffer,
     maxTries,
     drawDistance,
-    showDockingPoints: true,
     islands,
     currentDockingIndex: 0,
     bezierPath: null,
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
     showDestinationModal: true,
     inventory: [
-      { name: 'food', value: 0 },
-      { name: 'fuel', value: 0 },
+      { name: 'food', value: 5 },
+      { name: 'fuel', value: 5 },
     ],
     fuelDistanceTraveled: 0,
     fuelUnitDistance: 50, // every 50 units, use 1 fuel

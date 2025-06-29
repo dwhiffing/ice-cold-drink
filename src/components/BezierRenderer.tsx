@@ -1,4 +1,4 @@
-import { TransformControls } from '@react-three/drei'
+import { DebugTransform } from './DebugTransform'
 import React from 'react'
 import { useGameStore } from '../store/gameStore'
 
@@ -91,7 +91,7 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
       handles.push(
         <React.Fragment key={key + '-handles'}>
           {/* Start handle */}
-          <TransformControls
+          <DebugTransform
             showY={false}
             position={[bezier.control1[0], 0.3, bezier.control1[1]]}
             onMouseUp={(event) => {
@@ -108,9 +108,9 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
               <sphereGeometry args={[0.15, 12, 12]} />
               <meshBasicMaterial color="red" />
             </mesh>
-          </TransformControls>
+          </DebugTransform>
           {/* End handle */}
-          <TransformControls
+          <DebugTransform
             position={[bezier.control2[0], 0.3, bezier.control2[1]]}
             showY={false}
             onMouseUp={(event) => {
@@ -127,7 +127,7 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
               <sphereGeometry args={[0.15, 12, 12]} />
               <meshBasicMaterial color="blue" />
             </mesh>
-          </TransformControls>
+          </DebugTransform>
         </React.Fragment>,
       )
     })

@@ -19,7 +19,7 @@ export function Menu(props: {
         }}
       />
       <div className="flex flex-col items-center gap-4">
-        <h3 className="text-3xl font-bold">Red Dot Game</h3>
+        <h3 className="text-3xl font-bold">Ice Cold Drink</h3>
         <p>
           {props.gameState === 'lose'
             ? 'You lose!'

@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import crusoe from 'crusoe'
 import { useMemo } from 'react'
 import { Lighthouse } from './Lighthouse'
-import { TransformControls } from '@react-three/drei'
+import { DebugTransform } from '../components/DebugTransform'
+import { DEBUG } from '../utils/constants'
 import { useGameStore } from '../store/gameStore'
 
 const RESOLUTION = 42
@@ -22,7 +23,6 @@ export function Island({
   dockingPoint,
   lighthousePosition,
   lighthouseRotation = { y: 0 },
-  showDockingPoint = true,
 }: {
   x: number
   y: number
@@ -38,7 +38,6 @@ export function Island({
   dockingPoint: { dx: number; dy: number }
   lighthousePosition: { x: number; y: number }
   lighthouseRotation?: { y: number }
-  showDockingPoint?: boolean
 }) {
   const islands = useGameStore((s) => s.islands)
   const setIslands = useGameStore.setState as (
@@ -133,7 +132,7 @@ export function Island({
 
   return (
     <>
-      <TransformControls
+      <DebugTransform
         position={[x + offsetX, offsetY, y + offsetZ]}
         mode="translate"
         onMouseUp={handleChangeIslandPosition}
@@ -147,10 +146,10 @@ export function Island({
           rotation={[-Math.PI / 2, 0, 0]}
           scale={[2, 2, 2]}
         />
-      </TransformControls>
+      </DebugTransform>
 
-      {showDockingPoint && (
-        <TransformControls
+      {DEBUG && (
+        <DebugTransform
           position={[x + dockingPoint.dx, -0.5, y + dockingPoint.dy]}
           mode="translate"
           onMouseUp={handleChangeDockingPoint}
@@ -162,10 +161,10 @@ export function Island({
             <sphereGeometry args={[0.5, 16, 16]} />
             <meshStandardMaterial color="orange" />
           </mesh>
-        </TransformControls>
+        </DebugTransform>
       )}
 
-      <TransformControls
+      <DebugTransform
         position={[x + lighthousePosition.x, -0.3, y + lighthousePosition.y]}
         rotation={[0, lighthouseRotation.y, 0]}
         mode={mode}
@@ -175,7 +174,7 @@ export function Island({
         showZ={mode !== 'rotate'}
       >
         <Lighthouse />
-      </TransformControls>
+      </DebugTransform>
     </>
   )
 }

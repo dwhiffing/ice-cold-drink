@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { Water } from '../prefabs/Water'
-import { FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
+import { DEBUG, FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
 import { CameraControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
@@ -70,7 +70,6 @@ export const DefaultScene = () => {
             {...island}
             index={i}
             lighthouseRotation={island.lighthouseRotation}
-            showDockingPoint={true}
           />
         ))}
       <Boat
@@ -89,7 +88,7 @@ export const DefaultScene = () => {
       />
 
       {/* Render all bezier paths between island neighbours */}
-      <BezierRenderer islands={islands} />
+      {DEBUG && <BezierRenderer islands={islands} />}
     </>
   )
 }
