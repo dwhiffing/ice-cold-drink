@@ -11,7 +11,7 @@ export const UI = ({ children }: { children: ReactNode }) => {
 
   const handleToggleFastMode = () => {
     if (timescale === 1) {
-      setTimescale(5)
+      setTimescale(10)
       setFastMode(true)
     } else {
       setTimescale(1)
@@ -64,6 +64,8 @@ export const DestinationModal = () => {
     islands: typeof islands
     inventory: typeof inventory
   } | null>(null)
+  const [multiplier, setMultiplier] = useState(1)
+  const [multiplierMode, setMultiplierMode] = useState<'fixed' | 'max'>('fixed')
 
   // Cache last content when modal is open and has content
   useEffect(() => {
@@ -155,19 +157,36 @@ export const DestinationModal = () => {
     return price
   }
 
-  const handleBuy = (resource: string) => {
+  const getMaxBuy = (resource: string) => {
     const price = getResourcePrice(resource)
-    if (money >= price) {
-      set.getState().addToInventory(resource, 1)
-      set.setState((state) => ({ money: state.money - price }))
+    return Math.floor(money / price)
+  }
+  const getMaxSell = (resource: string) => {
+    return inventory.find((i) => i.name === resource)?.value ?? 0
+  }
+
+  const handleBuy = (resource: string) => {
+    let amount = multiplier
+    if (multiplierMode === 'max') {
+      amount = getMaxBuy(resource)
+    }
+    const price = getResourcePrice(resource)
+    const totalCost = price * amount
+    if (money >= totalCost && amount > 0) {
+      set.getState().addToInventory(resource, amount)
+      set.setState((state) => ({ money: state.money - totalCost }))
     }
   }
   const handleSell = (resource: string) => {
+    let amount = multiplier
+    if (multiplierMode === 'max') {
+      amount = getMaxSell(resource)
+    }
     const price = getResourcePrice(resource)
-    const amount = inventory.find((i) => i.name === resource)?.value ?? 0
-    if (amount > 0) {
-      set.getState().subtractFromInventory(resource, 1)
-      set.setState((state) => ({ money: state.money + price }))
+    const sellAmount = Math.min(amount, getMaxSell(resource))
+    if (sellAmount > 0) {
+      set.getState().subtractFromInventory(resource, sellAmount)
+      set.setState((state) => ({ money: state.money + price * sellAmount }))
     }
   }
 
@@ -201,6 +220,7 @@ export const DestinationModal = () => {
           <div className="text-lg font-bold mb-3 text-yellow-500">
             Money: ${money}
           </div>
+
           <div className="mb-4 grid sm:grid-cols-2 gap-2 sm:gap-4">
             {inventory
               .map((item) => item.name)
@@ -229,7 +249,7 @@ export const DestinationModal = () => {
                       <button
                         className="px-2 py-1 bg-red-700 rounded hover:bg-red-600 text-xs font-bold"
                         onClick={() => handleSell(resource)}
-                        disabled={quantity <= 0}
+                        disabled={getMaxSell(resource) <= 0}
                       >
                         Sell
                       </button>
@@ -239,7 +259,7 @@ export const DestinationModal = () => {
                       <button
                         className="px-2 py-1 bg-green-700 rounded hover:bg-green-600 text-xs font-bold"
                         onClick={() => handleBuy(resource)}
-                        disabled={money < price}
+                        disabled={getMaxBuy(resource) <= 0}
                       >
                         Buy
                       </button>
@@ -247,6 +267,44 @@ export const DestinationModal = () => {
                   </div>
                 )
               })}
+          </div>
+          <div className="mb-2 flex justify-center gap-2">
+            <button
+              className={`px-2 py-1 rounded font-bold border-2 ${
+                multiplierMode === 'fixed' && multiplier === 1
+                  ? '!bg-yellow-500 text-white'
+                  : 'bg-zinc-700 border-zinc-500 text-zinc-200'
+              }`}
+              onClick={() => {
+                setMultiplier(1)
+                setMultiplierMode('fixed')
+              }}
+            >
+              1x
+            </button>
+            <button
+              className={`px-2 py-1 rounded font-bold border-2 ${
+                multiplierMode === 'fixed' && multiplier === 10
+                  ? '!bg-yellow-500 text-white'
+                  : 'bg-zinc-700 border-zinc-500 text-zinc-200'
+              }`}
+              onClick={() => {
+                setMultiplier(10)
+                setMultiplierMode('fixed')
+              }}
+            >
+              10x
+            </button>
+            <button
+              className={`px-2 py-1 rounded font-bold border-2 ${
+                multiplierMode === 'max'
+                  ? '!bg-yellow-500  text-white'
+                  : 'bg-zinc-700 border-zinc-500 text-zinc-200'
+              }`}
+              onClick={() => setMultiplierMode('max')}
+            >
+              Max
+            </button>
           </div>
           <h2 className="text-lg font-bold mb-2">Select Destination</h2>
           <ul className="flex flex-wrap justify-center gap-4">
