@@ -39,6 +39,7 @@ function generateIslands({
   maxTries: number
 }) {
   const rand = mulberry32(seed)
+  const rand2 = mulberry32(seed)
   const islands: IslandData[] = []
   for (let i = 0; i < count; i++) {
     let tries = 0
@@ -52,9 +53,18 @@ function generateIslands({
       tries++
     }
     if (ok) {
-      const prices = {
+      // Assign prices for all resources
+      const prices: { [key: string]: number; fuel: number } = {
         fuel: Math.floor(rand() * 16) + 5,
       }
+      COMMODITIES.forEach((c) => {
+        // Each island gets a price for each commodity, randomizing around its base value
+        const variance = c.baseValue * 0.5
+        prices[c.name] = Math.max(
+          1,
+          Math.round(c.baseValue + (rand2() - 0.5) * variance * 2),
+        )
+      })
       islands.push({
         x: ix,
         y: iy,
@@ -141,6 +151,15 @@ function generateIslands({
   return islands
 }
 
+// Define commodities and their base values
+export const COMMODITIES = [
+  { name: 'commodity_a', label: 'Commodity A', baseValue: 10 },
+  { name: 'commodity_b', label: 'Commodity B', baseValue: 50 },
+  { name: 'commodity_c', label: 'Commodity C', baseValue: 200 },
+  { name: 'commodity_d', label: 'Commodity D', baseValue: 500 },
+  { name: 'commodity_e', label: 'Commodity E', baseValue: 1000 },
+]
+
 export interface IslandData {
   x: number
   y: number
@@ -178,6 +197,8 @@ export interface IslandData {
     // Add other resources here in the future
     [key: string]: number
   }
+  cheapResource?: string
+  expensiveResource?: string
 }
 
 export interface GameState {
@@ -248,8 +269,12 @@ export const useGameStore = create<GameState>((set, get) => {
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
     showDestinationModal: false,
     inventory: [
-      // { name: 'food', value: 5 },
       { name: 'fuel', value: 50 },
+      { name: 'commodity_a', value: 0 },
+      { name: 'commodity_b', value: 0 },
+      { name: 'commodity_c', value: 0 },
+      { name: 'commodity_d', value: 0 },
+      { name: 'commodity_e', value: 0 },
     ],
     fuelDistanceTraveled: 0,
     gameStarted: DEBUG,
@@ -266,9 +291,25 @@ export const useGameStore = create<GameState>((set, get) => {
       const currentIsland = islands[currentIdx]
       const bezier = currentIsland.beziers[index]
       if (!bezier) return
+      // Pick new cheap/expensive resources for each island
+      const newIslands = islands.map((island) => {
+        const commodityNames = COMMODITIES.map((c) => c.name)
+        // Pick two different random commodities
+        const cheapIdx = Math.floor(Math.random() * commodityNames.length)
+        let expensiveIdx = Math.floor(Math.random() * commodityNames.length)
+        while (expensiveIdx === cheapIdx) {
+          expensiveIdx = Math.floor(Math.random() * commodityNames.length)
+        }
+        return {
+          ...island,
+          cheapResource: commodityNames[cheapIdx],
+          expensiveResource: commodityNames[expensiveIdx],
+        }
+      })
       set({
         bezierPath: bezier,
         currentDockingIndex: index,
+        islands: newIslands,
         // TODO: re-enable encounters
         // encounterTiming: Math.random() * 0.6 + 0.2,
       })

@@ -66,6 +66,7 @@ export const DestinationModal = () => {
     const _island = srcIslands[currentDockingIndex]
     const neighbourIndices =
       srcIslands && _island?.neighbours ? _island.neighbours : []
+
     return neighbourIndices.map((idx) => {
       const island = srcIslands[idx]
       const distance = Math.sqrt(
@@ -164,36 +165,50 @@ export const DestinationModal = () => {
           <div className="mb-4">
             {inventory
               .map((item) => item.name)
-              .map((resource) => (
-                <div
-                  key={resource}
-                  className="flex items-center justify-center gap-2 mb-2"
-                >
-                  <span className="w-12 text-right capitalize">
-                    {resource}:
-                  </span>
-                  <button
-                    className="px-2 py-1 bg-red-700 rounded hover:bg-red-600 text-lg font-bold"
-                    onClick={() => handleSell(resource)}
-                  >
-                    Sell
-                  </button>
+              .map((resource) => {
+                let color = ''
+                let price = currentIsland?.prices?.[resource] ?? 0
+                const quantity =
+                  displayInventory.find((i) => i.name === resource)?.value ?? 0
+                if (resource === currentIsland?.cheapResource) {
+                  color = 'text-green-400 font-bold'
+                  price = Math.round(price / 3)
+                }
+                if (resource === currentIsland?.expensiveResource) {
+                  color = 'text-red-400 font-bold'
+                  price = Math.round(price * 3)
+                }
 
-                  <span className="w-8 text-center">
-                    {displayInventory.find((i) => i.name === resource)?.value ??
-                      0}
-                  </span>
-                  <button
-                    className="px-2 py-1 bg-green-700 rounded hover:bg-green-600 text-lg font-bold"
-                    onClick={() => handleBuy(resource)}
+                return (
+                  <div
+                    key={resource}
+                    className={`flex items-center justify-center gap-2 mb-2 ${color}`}
                   >
-                    Buy
-                  </button>
-                  <div className="text-center mb-2 text-sm text-yellow-300">
-                    <b>${currentIsland?.prices[resource] || 10}</b>
+                    <span className="w-12 text-right capitalize">
+                      {resource
+                        .replace('commodity_', 'Commodity ')
+                        .replace('fuel', 'Fuel')}
+                      :
+                    </span>
+                    <span className="w-16 text-yellow-300 text-xs">
+                      Price: {price}
+                    </span>
+                    <button
+                      className="px-2 py-1 bg-red-700 rounded hover:bg-red-600 text-lg font-bold"
+                      onClick={() => handleSell(resource)}
+                    >
+                      Sell
+                    </button>
+                    <span className="w-8 text-center">{quantity}</span>
+                    <button
+                      className="px-2 py-1 bg-green-700 rounded hover:bg-green-600 text-lg font-bold"
+                      onClick={() => handleBuy(resource)}
+                    >
+                      Buy
+                    </button>
                   </div>
-                </div>
-              ))}
+                )
+              })}
           </div>
           <h2 className="text-lg font-bold mb-2">Select Destination</h2>
           <ul className="flex gap-4">{destinationListItems}</ul>
