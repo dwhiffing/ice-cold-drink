@@ -4,10 +4,12 @@ import { useGameStore } from '../store/gameStore'
 const DURATION = 1000
 export const UI = ({ children }: { children: ReactNode }) => {
   const inventory = useGameStore((s) => s.inventory)
+  const money = useGameStore((s) => s.money)
 
   return (
     <div className="pointer-events-none absolute top-0 left-0 w-screen h-screen flex z-[100]">
       <div className="flex flex-col gap-1 text-white p-2">
+        <div className="text-sm font-bold">Money: ${money}</div>
         {inventory.map((item) => (
           <div key={item.name} className="text-sm">
             {item.name.charAt(0).toUpperCase() + item.name.slice(1)}:{' '}
@@ -30,8 +32,8 @@ export const DestinationModal = () => {
   const islands = useGameStore((s) => s.islands)
   const moveBoatToDock = useGameStore((s) => s.moveBoatToDock)
   const inventory = useGameStore((s) => s.inventory)
-  const addToInventory = useGameStore((s) => s.addToInventory)
-  const subtractFromInventory = useGameStore((s) => s.subtractFromInventory)
+  const money = useGameStore((s) => s.money)
+  const set = useGameStore
 
   const [localShowDestinationModal, setLocalShowDestinationModal] =
     useState(true)
@@ -116,6 +118,24 @@ export const DestinationModal = () => {
   const isOpen = showDestinationModal && localShowDestinationModal
   const displayInventory = isOpen ? inventory : lastContent?.inventory || []
 
+  const currentIsland = islands[currentDockingIndex]
+
+  const handleBuy = (resource: string) => {
+    const price = currentIsland?.prices?.[resource] || 10
+    if (money >= price) {
+      set.getState().addToInventory(resource, 1)
+      set.setState((state) => ({ money: state.money - price }))
+    }
+  }
+  const handleSell = (resource: string) => {
+    const price = currentIsland?.prices?.[resource] || 10
+    const amount = inventory.find((i) => i.name === resource)?.value ?? 0
+    if (amount > 0) {
+      set.getState().subtractFromInventory(resource, 1)
+      set.setState((state) => ({ money: state.money + price }))
+    }
+  }
+
   return (
     <>
       <button
@@ -153,21 +173,25 @@ export const DestinationModal = () => {
                     {resource}:
                   </span>
                   <button
-                    className="px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
-                    onClick={() => subtractFromInventory(resource, 1)}
+                    className="px-2 py-1 bg-red-700 rounded hover:bg-red-600 text-lg font-bold"
+                    onClick={() => handleSell(resource)}
                   >
-                    -
+                    Sell
                   </button>
+
                   <span className="w-8 text-center">
                     {displayInventory.find((i) => i.name === resource)?.value ??
                       0}
                   </span>
                   <button
-                    className="px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
-                    onClick={() => addToInventory(resource, 1)}
+                    className="px-2 py-1 bg-green-700 rounded hover:bg-green-600 text-lg font-bold"
+                    onClick={() => handleBuy(resource)}
                   >
-                    +
+                    Buy
                   </button>
+                  <div className="text-center mb-2 text-sm text-yellow-300">
+                    <b>${currentIsland?.prices[resource] || 10}</b>
+                  </div>
                 </div>
               ))}
           </div>

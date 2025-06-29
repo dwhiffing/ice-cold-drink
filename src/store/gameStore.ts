@@ -7,6 +7,7 @@ import {
   ISLAND_NAMES,
   NEIGHBOUR_DISTANCE,
   STARTING_ISLAND,
+  STARTING_MONEY,
 } from '../utils/constants'
 
 function mulberry32(seed: number) {
@@ -51,6 +52,9 @@ function generateIslands({
       tries++
     }
     if (ok) {
+      const prices = {
+        fuel: Math.floor(rand() * 16) + 5,
+      }
       islands.push({
         x: ix,
         y: iy,
@@ -74,6 +78,7 @@ function generateIslands({
         beziers: {}, // will be filled in next step
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         bezierOverrides: (overrides[i]?.bezierOverrides as any) ?? {},
+        prices,
       })
     }
   }
@@ -168,6 +173,11 @@ export interface IslandData {
       end: [number, number]
     }
   }
+  prices: {
+    fuel: number
+    // Add other resources here in the future
+    [key: string]: number
+  }
 }
 
 export interface GameState {
@@ -205,6 +215,7 @@ export interface GameState {
     options: { label: string; onSelect: () => void }[]
   }
   triggerEncounter: () => void
+  money: number
 }
 
 export const useGameStore = create<GameState>((set, get) => {
@@ -244,6 +255,7 @@ export const useGameStore = create<GameState>((set, get) => {
     gameStarted: DEBUG,
     encounterTiming: null,
     encounterModal: null,
+    money: STARTING_MONEY,
   }
 
   return {
