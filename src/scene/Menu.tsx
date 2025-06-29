@@ -1,10 +1,9 @@
+import { useGameStore } from '../store/gameStore'
 import { DUR, PRIMARY_COLOR } from '../utils/constants'
 
-export function Menu(props: {
-  onStart: () => void
-  gameState: 'win' | 'lose' | ''
-  fade: boolean
-}) {
+export function Menu(props: { onStart: () => void; fade: boolean }) {
+  const highestMoveCount = useGameStore((s) => s.highestMoveCount ?? 0)
+  const highestMoney = useGameStore((s) => s.highestMoney ?? 0)
   return (
     <div
       className="flex justify-center items-center h-screen text-white"
@@ -18,15 +17,16 @@ export function Menu(props: {
           pointerEvents: props.fade ? 'auto' : 'none',
         }}
       />
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center text-center gap-4">
         <h3 className="text-3xl font-bold">Ice Cold Drink</h3>
-        <p>
-          {props.gameState === 'lose'
-            ? 'You lose!'
-            : props.gameState === 'win'
-            ? 'You win!'
-            : ''}
-        </p>
+        {(highestMoveCount > 0 || highestMoney > 0) && (
+          <div className="text-sm">
+            {highestMoveCount > 0 && (
+              <div>Highest Move Count: {highestMoveCount}</div>
+            )}
+            {highestMoney > 0 && <div>Highest Money: ${highestMoney}</div>}
+          </div>
+        )}
         <div className="flex flex-col gap-3">
           <button onClick={props.onStart}>Start Game</button>
         </div>

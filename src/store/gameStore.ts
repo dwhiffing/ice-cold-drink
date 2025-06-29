@@ -6,6 +6,7 @@ import {
   FUEL_UNIT_DISTANCE,
   ISLAND_NAMES,
   NEIGHBOUR_DISTANCE,
+  STARTING_FUEL,
   STARTING_ISLAND,
   STARTING_MONEY,
 } from '../utils/constants'
@@ -238,6 +239,19 @@ export interface GameState {
   }
   triggerEncounter: () => void
   money: number
+  highestMoveCount?: number
+  highestMoney?: number
+}
+
+function getLocalHighs() {
+  return {
+    highestMoveCount: Number(
+      localStorage.getItem('ice-cold-drink-highestMoveCount') || 0,
+    ),
+    highestMoney: Number(
+      localStorage.getItem('ice-cold-drink-highestMoney') || 0,
+    ),
+  }
 }
 
 export const useGameStore = create<GameState>((set, get) => {
@@ -256,6 +270,7 @@ export const useGameStore = create<GameState>((set, get) => {
     angle: Math.PI * 0.5,
   }
 
+  const highs = getLocalHighs()
   const initialState = {
     boatState: initialBoat,
     count,
@@ -270,7 +285,7 @@ export const useGameStore = create<GameState>((set, get) => {
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
     showDestinationModal: false,
     inventory: [
-      { name: 'fuel', value: 50 },
+      { name: 'fuel', value: STARTING_FUEL },
       { name: 'commodity_a', value: 0 },
       { name: 'commodity_b', value: 0 },
       { name: 'commodity_c', value: 0 },
@@ -283,6 +298,24 @@ export const useGameStore = create<GameState>((set, get) => {
     encounterModal: null,
     money: STARTING_MONEY,
     moveCount: 0,
+    highestMoveCount: highs.highestMoveCount,
+    highestMoney: highs.highestMoney,
+  }
+
+  function updateHighs(moveCount: number, money: number) {
+    const { highestMoveCount, highestMoney } = get()
+    let updated = false
+    if (moveCount > (highestMoveCount || 0)) {
+      localStorage.setItem('ice-cold-drink-highestMoveCount', String(moveCount))
+      set({ highestMoveCount: moveCount })
+      updated = true
+    }
+    if (money > (highestMoney || 0)) {
+      localStorage.setItem('ice-cold-drink-highestMoney', String(money))
+      set({ highestMoney: money })
+      updated = true
+    }
+    return updated
   }
 
   function getFuelPrice(moveCount: number): number {
@@ -324,9 +357,8 @@ export const useGameStore = create<GameState>((set, get) => {
         currentDockingIndex: index,
         islands: updatedIslands,
         moveCount,
-        // TODO: re-enable encounters
-        // encounterTiming: Math.random() * 0.6 + 0.2,
       })
+      updateHighs(moveCount, get().money)
     },
     setBoatState: (state) => {
       const prev = get().boatState
@@ -354,7 +386,6 @@ export const useGameStore = create<GameState>((set, get) => {
         boatState: state,
         fuelDistanceTraveled,
         inventory,
-        moveCount: get().moveCount + 1,
       })
     },
     setLighthouseEditMode: (mode) => set({ lighthouseEditMode: mode }),
@@ -380,11 +411,19 @@ export const useGameStore = create<GameState>((set, get) => {
       navigator.clipboard.writeText(JSON.stringify(positions, null, 2))
     },
     addToInventory: (name: string, amount: number) =>
-      set((state) => ({
-        inventory: state.inventory.map((item) =>
-          item.name === name ? { ...item, value: item.value + amount } : item,
-        ),
-      })),
+      set((state) => {
+        if (name === 'money') {
+          const newMoney =
+            (state.inventory.find((i) => i.name === 'money')?.value || 0) +
+            amount
+          updateHighs(state.moveCount, newMoney)
+        }
+        return {
+          inventory: state.inventory.map((item) =>
+            item.name === name ? { ...item, value: item.value + amount } : item,
+          ),
+        }
+      }),
     subtractFromInventory: (name: string, amount: number) =>
       set((state) => ({
         inventory: state.inventory.map((item) =>

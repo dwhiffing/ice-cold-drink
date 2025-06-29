@@ -13,7 +13,6 @@ export default function App() {
   const gameStarted = useGameStore((s) => s.gameStarted)
   const setGameStarted = useGameStore((s) => s.setGameStarted)
   const [gameFade, setGameFade] = useState(false)
-  const [gameState] = useState('')
   const [menuFade, setMenuFade] = useState(false)
 
   useEffect(() => {
@@ -77,7 +76,6 @@ export default function App() {
   ) : (
     <Menu
       fade={menuFade}
-      gameState={gameState as 'win' | 'lose'}
       onStart={() => {
         playSound(clickSound, 0.9, 1.1, 0.35)
         onStart()

@@ -2,6 +2,7 @@ export const DEBUG = false
 export const FOG_DISTANCE = 60
 export const STARTING_ISLAND = 0
 export const STARTING_MONEY = 100
+export const STARTING_FUEL = 10
 export const TIMESCALE = 5
 export const DUR = 1000
 export const BOAT_SPEED = 0.0005 * TIMESCALE
