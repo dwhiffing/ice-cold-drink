@@ -219,6 +219,7 @@ export interface GameState {
   } | null
   inventory: { name: string; value: number }[]
   fuelDistanceTraveled: number
+  moveCount: number
   moveBoatToDock: (index: number) => void
   setBoatState: (state: { x: number; y: number; angle: number }) => void
   lighthouseEditMode: 'translate' | 'rotate'
@@ -281,6 +282,13 @@ export const useGameStore = create<GameState>((set, get) => {
     encounterTiming: null,
     encounterModal: null,
     money: STARTING_MONEY,
+    moveCount: 0,
+  }
+
+  function getFuelPrice(moveCount: number): number {
+    return Math.round(
+      10 + 5 * moveCount + 0.75 * Math.pow(Math.max(0, moveCount - 10), 2),
+    )
   }
 
   return {
@@ -294,7 +302,6 @@ export const useGameStore = create<GameState>((set, get) => {
       // Pick new cheap/expensive resources for each island
       const newIslands = islands.map((island) => {
         const commodityNames = COMMODITIES.map((c) => c.name)
-        // Pick two different random commodities
         const cheapIdx = Math.floor(Math.random() * commodityNames.length)
         let expensiveIdx = Math.floor(Math.random() * commodityNames.length)
         while (expensiveIdx === cheapIdx) {
@@ -306,10 +313,17 @@ export const useGameStore = create<GameState>((set, get) => {
           expensiveResource: commodityNames[expensiveIdx],
         }
       })
+      const moveCount = get().moveCount + 1
+      const fuelPrice = getFuelPrice(moveCount)
+      const updatedIslands = newIslands.map((island) => ({
+        ...island,
+        prices: { ...island.prices, fuel: fuelPrice },
+      }))
       set({
         bezierPath: bezier,
         currentDockingIndex: index,
-        islands: newIslands,
+        islands: updatedIslands,
+        moveCount,
         // TODO: re-enable encounters
         // encounterTiming: Math.random() * 0.6 + 0.2,
       })
@@ -336,7 +350,12 @@ export const useGameStore = create<GameState>((set, get) => {
             : item,
         )
       }
-      set({ boatState: state, fuelDistanceTraveled, inventory })
+      set({
+        boatState: state,
+        fuelDistanceTraveled,
+        inventory,
+        moveCount: get().moveCount + 1,
+      })
     },
     setLighthouseEditMode: (mode) => set({ lighthouseEditMode: mode }),
     setShowDestinationModal: (show) => set({ showDestinationModal: show }),
