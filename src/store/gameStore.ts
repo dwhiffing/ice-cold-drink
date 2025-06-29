@@ -414,9 +414,27 @@ export const useGameStore = create<GameState>((set, get) => {
             amount
           updateHighs(state.moveCount, newMoney)
         }
+        const totalItems = state.inventory
+          .filter((item) => item.name !== 'money' && item.name !== 'fuel')
+          .reduce((sum, item) => sum + item.value, 0)
+        const itemToAdd = state.inventory.find((item) => item.name === name)
+        if (!itemToAdd) return {}
+        if (name === 'money') {
+          return {
+            inventory: state.inventory.map((item) =>
+              item.name === name
+                ? { ...item, value: item.value + amount }
+                : item,
+            ),
+          }
+        }
+        const maxToAdd = Math.max(0, 100 - totalItems)
+        const actualAdd = Math.min(amount, maxToAdd)
         return {
           inventory: state.inventory.map((item) =>
-            item.name === name ? { ...item, value: item.value + amount } : item,
+            item.name === name
+              ? { ...item, value: item.value + actualAdd }
+              : item,
           ),
         }
       }),

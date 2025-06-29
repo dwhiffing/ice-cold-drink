@@ -158,8 +158,14 @@ export const DestinationModal = () => {
   }
 
   const getMaxBuy = (resource: string) => {
-    const price = getResourcePrice(resource)
-    return Math.floor(money / price)
+    const price =
+      getResourcePrice(resource) * (multiplierMode === 'max' ? 1 : multiplier)
+    // Calculate total items (excluding money and fuel)
+    const totalItems = inventory
+      .filter((item) => item.name !== 'money')
+      .reduce((sum, item) => sum + item.value, 0)
+    const availableSpace = 100 - totalItems
+    return Math.min(Math.floor(money / price), availableSpace)
   }
   const getMaxSell = (resource: string) => {
     return inventory.find((i) => i.name === resource)?.value ?? 0
@@ -206,7 +212,7 @@ export const DestinationModal = () => {
         } transition-opacity fixed inset-0 bg-black/70 flex items-center justify-center z-[200] px-5`}
         style={{ transitionDuration: `${DURATION}ms` }}
       >
-        <div className="bg-zinc-900 text-white p-8 rounded-xl min-w-80 shadow-2xl text-center relative">
+        <div className="bg-zinc-900 text-white p-8 rounded-xl min-w-80 shadow-2xl text-center relative overflow-y-scroll max-h-screen">
           <button
             className="absolute top-2 right-2 text-white bg-zinc-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-zinc-600 transition"
             onClick={() => setLocalShowDestinationModal(false)}
@@ -217,8 +223,17 @@ export const DestinationModal = () => {
           <h2 className="text-3xl font-bold mb-4">
             {islands[currentDockingIndex].name}
           </h2>
-          <div className="text-lg font-bold mb-3 text-yellow-500">
+          <div className="text-lg font-bold mb-0 text-yellow-500">
             Money: ${money}
+          </div>
+
+          <div className="text-sm mb-2 font-bold text-zinc-300">
+            {(() => {
+              const used = displayInventory
+                .filter((item) => item.name !== 'money')
+                .reduce((sum, item) => sum + item.value, 0)
+              return `Weight: ${used}/100`
+            })()}
           </div>
 
           <div className="mb-4 grid sm:grid-cols-2 gap-2 sm:gap-4">
@@ -270,7 +285,7 @@ export const DestinationModal = () => {
           </div>
           <div className="mb-2 flex justify-center gap-2">
             <button
-              className={`px-2 py-1 rounded font-bold border-2 ${
+              className={`text-xs px-2 py-1 rounded font-bold border-2 ${
                 multiplierMode === 'fixed' && multiplier === 1
                   ? '!bg-yellow-500 text-white'
                   : 'bg-zinc-700 border-zinc-500 text-zinc-200'
@@ -283,7 +298,7 @@ export const DestinationModal = () => {
               1x
             </button>
             <button
-              className={`px-2 py-1 rounded font-bold border-2 ${
+              className={`text-xs px-2 py-1 rounded font-bold border-2 ${
                 multiplierMode === 'fixed' && multiplier === 10
                   ? '!bg-yellow-500 text-white'
                   : 'bg-zinc-700 border-zinc-500 text-zinc-200'
@@ -296,7 +311,7 @@ export const DestinationModal = () => {
               10x
             </button>
             <button
-              className={`px-2 py-1 rounded font-bold border-2 ${
+              className={`text-xs px-2 py-1 rounded font-bold border-2 ${
                 multiplierMode === 'max'
                   ? '!bg-yellow-500  text-white'
                   : 'bg-zinc-700 border-zinc-500 text-zinc-200'
