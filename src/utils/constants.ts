@@ -1,9 +1,26 @@
 export const DEBUG = true
-export const FOG_DISTANCE = 60
+export const FOG_DISTANCE = 600000
+export const STARTING_ISLAND = 9
+export const TIMESCALE = 5
 export const DUR = 1000
+export const BOAT_SPEED = 0.0005 * TIMESCALE
+export const BOAT_ROTATE_SPEED = 0.01 * TIMESCALE
 export const FUEL_UNIT_DISTANCE = 200
 export const NEIGHBOUR_DISTANCE = 600
 export const PRIMARY_COLOR = '#557582'
+
+export const ISLAND_NAMES = [
+  'Azure Atoll',
+  'Borealis Bay',
+  'Garnet Grotto',
+  'Ivory Isle',
+  "Kraken's Key",
+  'Lapis Lagoon',
+  'Port Peregrine',
+  'Riptide Rock',
+  'Silver Shoals',
+  'Wake of Whispers',
+]
 
 export interface EncounterOption {
   label: string

@@ -4,7 +4,9 @@ import {
   DEBUG,
   ENCOUNTERS,
   FUEL_UNIT_DISTANCE,
+  ISLAND_NAMES,
   NEIGHBOUR_DISTANCE,
+  STARTING_ISLAND,
 } from '../utils/constants'
 
 function mulberry32(seed: number) {
@@ -52,6 +54,7 @@ function generateIslands({
       islands.push({
         x: ix,
         y: iy,
+        name: ISLAND_NAMES[i] ?? `Island ${i + 1}`,
         offsetX: overrides[i]?.offsetX ?? 0,
         offsetY: overrides[i]?.offsetY ?? 0,
         offsetZ: overrides[i]?.offsetZ ?? 0,
@@ -60,6 +63,7 @@ function generateIslands({
         size: 1.3,
         noise: 9,
         curve: 1.1,
+        index: i,
         lighthousePosition: overrides[i]?.lighthouse.position ?? { x: 0, y: 0 },
         lighthouseRotation:
           overrides[i]?.lighthouse.rotation?.y !== undefined
@@ -81,7 +85,10 @@ function generateIslands({
         dist:
           idx === j
             ? Infinity
-            : distance([island.x, island.y], [other.x, other.y]),
+            : distance(
+                [island.x + island.offsetX, island.y + island.offsetZ],
+                [other.x + other.offsetX, other.y + other.offsetZ],
+              ),
       }))
       .sort((a, b) => a.dist - b.dist)
     island.neighbours = dists
@@ -103,10 +110,8 @@ function generateIslands({
       ]
       let control1, control2
       // Load bezier handles from overrides if present
-      const bezierOverrides = overrides[i]?.bezierOverrides as Record<
-        number,
-        { control1: [number, number]; control2: [number, number] }
-      >
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const bezierOverrides = overrides[i]?.bezierOverrides as any
       if (bezierOverrides && bezierOverrides[j]) {
         control1 = bezierOverrides[j].control1
         control2 = bezierOverrides[j].control2
@@ -138,6 +143,8 @@ export interface IslandData {
   offsetY: number
   offsetZ: number
   seed: number
+  index: number
+  name: string
   elevation: number
   size: number
   noise: number
@@ -209,9 +216,10 @@ export const useGameStore = create<GameState>((set, get) => {
   const drawDistance = 500
   const islands = generateIslands({ count, seed, spread, buffer, maxTries })
   // Boat starts at first docking point
+  const startingIsland = STARTING_ISLAND
   const initialBoat = {
-    x: islands[0].x + islands[0].dockingPoint.dx,
-    y: islands[0].y + islands[0].dockingPoint.dy,
+    x: islands[startingIsland].x + islands[startingIsland].dockingPoint.dx,
+    y: islands[startingIsland].y + islands[startingIsland].dockingPoint.dy,
     angle: Math.PI * 0.5,
   }
 
@@ -224,13 +232,13 @@ export const useGameStore = create<GameState>((set, get) => {
     maxTries,
     drawDistance,
     islands,
-    currentDockingIndex: 0,
+    currentDockingIndex: STARTING_ISLAND,
     bezierPath: null,
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
     showDestinationModal: false,
     inventory: [
       // { name: 'food', value: 5 },
-      { name: 'fuel', value: 5 },
+      { name: 'fuel', value: 50 },
     ],
     fuelDistanceTraveled: 0,
     gameStarted: DEBUG,

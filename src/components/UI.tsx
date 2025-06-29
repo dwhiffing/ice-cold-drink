@@ -64,15 +64,17 @@ export const DestinationModal = () => {
         ? islands
         : lastContent?.islands
     if (!srcIslands || srcIslands.length === 0) return []
+    const _island = srcIslands[currentDockingIndex]
     const neighbourIndices =
-      srcIslands && srcIslands[currentDockingIndex]?.neighbours
-        ? srcIslands[currentDockingIndex].neighbours
-        : []
+      srcIslands && _island?.neighbours ? _island.neighbours : []
     return neighbourIndices.map((idx) => {
       const island = srcIslands[idx]
       const distance = Math.sqrt(
-        Math.pow(island.x - srcIslands[currentDockingIndex].x, 2) +
-          Math.pow(island.y - srcIslands[currentDockingIndex].y, 2),
+        Math.pow(island.x + island.offsetX - (_island.x + _island.offsetX), 2) +
+          Math.pow(
+            island.y + island.offsetZ - (_island.y + _island.offsetZ),
+            2,
+          ),
       )
       return { island, idx, distance }
     })
@@ -98,13 +100,13 @@ export const DestinationModal = () => {
   // Memoize the list items for the modal
   const destinationListItems = useMemo(
     () =>
-      destinationIslands.map(({ idx, distance }) => (
+      destinationIslands.map(({ island, idx, distance }) => (
         <li key={idx} className="my-2">
           <button
             className="px-4 py-2 rounded-md border-none bg-green-600 text-white font-bold cursor-pointer text-lg flex items-center gap-3 hover:bg-green-700 transition"
             onClick={() => handleSelect(idx)}
           >
-            Island {idx + 1}
+            {island.name} ({idx + 1})
             <span className="font-normal text-base opacity-80">
               ({Math.round(distance)} units)
             </span>

@@ -82,7 +82,6 @@ export const DefaultScene = () => {
           <Island
             key={i}
             {...island}
-            index={i}
             lighthouseRotation={island.lighthouseRotation}
           />
         ))}
