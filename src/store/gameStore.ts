@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import overrides from '../overrides.json'
+import { DEBUG } from '../utils/constants'
 
 function mulberry32(seed: number) {
   return function () {
@@ -172,6 +173,9 @@ export interface GameState {
     control2: [number, number]
     end: [number, number]
   } | null
+  inventory: { name: string; value: number }[]
+  fuelDistanceTraveled: number
+  fuelUnitDistance: number
   moveBoatToDock: (index: number) => void
   setBoatState: (state: { x: number; y: number; angle: number }) => void
   lighthouseEditMode: 'translate' | 'rotate'
@@ -179,6 +183,10 @@ export interface GameState {
   saveLighthousePositions: () => void
   showDestinationModal: boolean
   setShowDestinationModal: (show: boolean) => void
+  addToInventory: (name: string, amount: number) => void
+  subtractFromInventory: (name: string, amount: number) => void
+  gameStarted: boolean
+  setGameStarted: (started: boolean) => void
 }
 
 export const useGameStore = create<GameState>((set, get) => {
@@ -196,7 +204,7 @@ export const useGameStore = create<GameState>((set, get) => {
     angle: Math.PI * 0.5,
   }
 
-  return {
+  const initialState = {
     boatState: initialBoat,
     count,
     seed,
@@ -210,6 +218,17 @@ export const useGameStore = create<GameState>((set, get) => {
     bezierPath: null,
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
     showDestinationModal: true,
+    inventory: [
+      { name: 'food', value: 0 },
+      { name: 'fuel', value: 0 },
+    ],
+    fuelDistanceTraveled: 0,
+    fuelUnitDistance: 50, // every 50 units, use 1 fuel
+    gameStarted: DEBUG,
+  }
+
+  return {
+    ...initialState,
     moveBoatToDock: (index: number) => {
       const islands = get().islands
       const currentIdx = get().currentDockingIndex
@@ -221,7 +240,31 @@ export const useGameStore = create<GameState>((set, get) => {
         currentDockingIndex: index,
       })
     },
-    setBoatState: (state) => set({ boatState: state }),
+    setBoatState: (state) => {
+      const prev = get().boatState
+      const dist = distance([prev.x, prev.y], [state.x, state.y])
+      let fuelDistanceTraveled = get().fuelDistanceTraveled + dist
+      let inventory = get().inventory
+      let fuelUsed = 0
+      const fuelUnitDistance = get().fuelUnitDistance
+      while (fuelDistanceTraveled >= fuelUnitDistance) {
+        fuelDistanceTraveled -= fuelUnitDistance
+        fuelUsed++
+      }
+      if (fuelUsed > 0) {
+        const fuel = inventory.find((i) => i.name === 'fuel')?.value ?? 0
+        if (fuel <= 0) {
+          set({ ...initialState, gameStarted: false })
+          return
+        }
+        inventory = inventory.map((item) =>
+          item.name === 'fuel'
+            ? { ...item, value: Math.max(0, item.value - fuelUsed) }
+            : item,
+        )
+      }
+      set({ boatState: state, fuelDistanceTraveled, inventory })
+    },
     setLighthouseEditMode: (mode) => set({ lighthouseEditMode: mode }),
     setShowDestinationModal: (show) => set({ showDestinationModal: show }),
     saveLighthousePositions: () => {
@@ -244,5 +287,20 @@ export const useGameStore = create<GameState>((set, get) => {
       console.log('Saving overrides:', positions)
       navigator.clipboard.writeText(JSON.stringify(positions, null, 2))
     },
+    addToInventory: (name: string, amount: number) =>
+      set((state) => ({
+        inventory: state.inventory.map((item) =>
+          item.name === name ? { ...item, value: item.value + amount } : item,
+        ),
+      })),
+    subtractFromInventory: (name: string, amount: number) =>
+      set((state) => ({
+        inventory: state.inventory.map((item) =>
+          item.name === name
+            ? { ...item, value: Math.max(0, item.value - amount) }
+            : item,
+        ),
+      })),
+    setGameStarted: (started) => set({ gameStarted: started }),
   }
 })

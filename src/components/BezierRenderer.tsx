@@ -89,7 +89,7 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
         </line>,
       )
       handles.push(
-        <>
+        <React.Fragment key={key + '-handles'}>
           {/* Start handle */}
           <TransformControls
             showY={false}
@@ -128,7 +128,7 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
               <meshBasicMaterial color="blue" />
             </mesh>
           </TransformControls>
-        </>,
+        </React.Fragment>,
       )
     })
   })
