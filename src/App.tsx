@@ -11,6 +11,7 @@ import './index.css'
 export default function App() {
   const gameStarted = useGameStore((s) => s.gameStarted)
   const setGameStarted = useGameStore((s) => s.setGameStarted)
+  const isLoading = useGameStore((s) => s.isLoading)
   const [gameFade, setGameFade] = useState(false)
   const [menuFade, setMenuFade] = useState(false)
 
@@ -60,12 +61,14 @@ export default function App() {
     <>
       <UI>
         <div
-          className="transition-all inset-0 fixed z-20"
+          className="transition-all inset-0 fixed z-[-1] flex justify-center items-center text-white text-2xl"
           style={{
             backgroundColor: gameFade ? 'transparent' : PRIMARY_COLOR,
             transitionDuration: `${gameFade ? DUR : DUR / 2}ms`,
           }}
-        />
+        >
+          {isLoading && <p>Loading...</p>}
+        </div>
       </UI>
       <Canvas>
         <DefaultScene />

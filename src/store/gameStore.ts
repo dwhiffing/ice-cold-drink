@@ -205,6 +205,7 @@ export interface IslandData {
 export interface GameState {
   boatState: { x: number; y: number; angle: number }
   count: number
+  isLoading: boolean
   seed: number
   spread: number
   buffer: number
@@ -273,6 +274,7 @@ export const useGameStore = create<GameState>((set, get) => {
   const highs = getLocalHighs()
   const initialState = {
     boatState: initialBoat,
+    isLoading: true,
     count,
     seed,
     spread,

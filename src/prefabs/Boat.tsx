@@ -21,6 +21,12 @@ export const Boat = ({
     materials.preload()
     loader.setMaterials(materials)
   })
+  useEffect(() => {
+    if (obj && materials) {
+      useGameStore.setState({ isLoading: false })
+    }
+  }, [obj, materials])
+
   const stateRef = useRef({ x, y, angle, speed: 0 })
   const bezierPath = useGameStore((s) => s.bezierPath)
   const tRef = useRef(0)
