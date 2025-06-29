@@ -60,7 +60,7 @@ function generateIslands({
       }
       COMMODITIES.forEach((c) => {
         // Each island gets a price for each commodity, randomizing around its base value
-        const variance = c.baseValue * 0.5
+        const variance = c.baseValue * 0.2
         prices[c.name] = Math.max(
           1,
           Math.round(c.baseValue + (rand2() - 0.5) * variance * 2),
@@ -149,16 +149,16 @@ function generateIslands({
       island.beziers[j] = { start, control1, control2, end }
     })
   })
+
   return islands
 }
 
-// Define commodities and their base values
 export const COMMODITIES = [
-  { name: 'commodity_a', label: 'Commodity A', baseValue: 10 },
-  { name: 'commodity_b', label: 'Commodity B', baseValue: 50 },
-  { name: 'commodity_c', label: 'Commodity C', baseValue: 200 },
-  { name: 'commodity_d', label: 'Commodity D', baseValue: 500 },
-  { name: 'commodity_e', label: 'Commodity E', baseValue: 1000 },
+  { name: 'Lumber', baseValue: 10 },
+  { name: 'Copper', baseValue: 50 },
+  { name: 'Coffee', baseValue: 200 },
+  { name: 'Ambergris', baseValue: 500 },
+  { name: 'Pearls', baseValue: 1000 },
 ]
 
 export interface IslandData {
@@ -286,11 +286,7 @@ export const useGameStore = create<GameState>((set, get) => {
     showDestinationModal: false,
     inventory: [
       { name: 'fuel', value: STARTING_FUEL },
-      { name: 'commodity_a', value: 0 },
-      { name: 'commodity_b', value: 0 },
-      { name: 'commodity_c', value: 0 },
-      { name: 'commodity_d', value: 0 },
-      { name: 'commodity_e', value: 0 },
+      ...COMMODITIES.map((c) => ({ name: c.name, value: 0 })),
     ],
     fuelDistanceTraveled: 0,
     gameStarted: DEBUG,

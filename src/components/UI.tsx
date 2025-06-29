@@ -9,13 +9,15 @@ export const UI = ({ children }: { children: ReactNode }) => {
   return (
     <div className="pointer-events-none absolute top-0 left-0 w-screen h-screen flex z-[100]">
       <div className="flex flex-col gap-1 text-white p-2">
-        <div className="text-sm font-bold">Money: ${money}</div>
-        {inventory.map((item) => (
-          <div key={item.name} className="text-sm">
-            {item.name.charAt(0).toUpperCase() + item.name.slice(1)}:{' '}
-            {item.value}
-          </div>
-        ))}
+        <div className="text-sm">Money: ${money}</div>
+        {inventory
+          .filter((i) => i.name === 'fuel')
+          .map((item) => (
+            <div key={item.name} className="text-sm">
+              {item.name.charAt(0).toUpperCase() + item.name.slice(1)}:{' '}
+              {item.value}
+            </div>
+          ))}
       </div>
 
       <DestinationModal />
@@ -92,7 +94,7 @@ export const DestinationModal = () => {
       setLocalShowDestinationModal(true)
       setTimeout(() => {
         moveBoatToDock(idx)
-      }, DURATION / 2)
+      }, DURATION)
     },
     [setShowDestinationModal, moveBoatToDock],
   )
@@ -121,15 +123,26 @@ export const DestinationModal = () => {
 
   const currentIsland = islands[currentDockingIndex]
 
+  const getResourcePrice = (resource: string) => {
+    let price = currentIsland?.prices?.[resource] || 10
+    if (resource === currentIsland?.cheapResource) {
+      price = Math.round(price / 3)
+    }
+    if (resource === currentIsland?.expensiveResource) {
+      price = Math.round(price * 3)
+    }
+    return price
+  }
+
   const handleBuy = (resource: string) => {
-    const price = currentIsland?.prices?.[resource] || 10
+    const price = getResourcePrice(resource)
     if (money >= price) {
       set.getState().addToInventory(resource, 1)
       set.setState((state) => ({ money: state.money - price }))
     }
   }
   const handleSell = (resource: string) => {
-    const price = currentIsland?.prices?.[resource] || 10
+    const price = getResourcePrice(resource)
     const amount = inventory.find((i) => i.name === resource)?.value ?? 0
     if (amount > 0) {
       set.getState().subtractFromInventory(resource, 1)
@@ -139,12 +152,14 @@ export const DestinationModal = () => {
 
   return (
     <>
-      <button
-        className="pointer-events-auto absolute top-4 right-4 px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
-        onClick={() => setLocalShowDestinationModal(true)}
-      >
-        Show Destinations
-      </button>
+      {!localShowDestinationModal && (
+        <button
+          className="pointer-events-auto absolute top-4 right-4 px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
+          onClick={() => setLocalShowDestinationModal(true)}
+        >
+          Show Inventory
+        </button>
+      )}
       <div
         className={`${
           isOpen ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
@@ -159,53 +174,55 @@ export const DestinationModal = () => {
           >
             ×
           </button>
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className="text-3xl font-bold mb-4">
             {islands[currentDockingIndex].name}
           </h2>
-          <div className="mb-4">
+          <div className="text-lg font-bold mb-3 text-green-500">
+            Money: ${money}
+          </div>
+          <div className="mb-4 grid grid-cols-2 gap-4">
             {inventory
               .map((item) => item.name)
               .map((resource) => {
                 let color = ''
-                let price = currentIsland?.prices?.[resource] ?? 0
+                const price = getResourcePrice(resource)
                 const quantity =
                   displayInventory.find((i) => i.name === resource)?.value ?? 0
                 if (resource === currentIsland?.cheapResource) {
                   color = 'text-green-400 font-bold'
-                  price = Math.round(price / 3)
                 }
                 if (resource === currentIsland?.expensiveResource) {
                   color = 'text-red-400 font-bold'
-                  price = Math.round(price * 3)
                 }
 
                 return (
                   <div
                     key={resource}
-                    className={`flex items-center justify-center gap-2 mb-2 ${color}`}
+                    className={`flex flex-col items-center justify-center gap-2 mb-2 ${color}`}
                   >
-                    <span className="w-12 text-right capitalize">
-                      {resource
-                        .replace('commodity_', 'Commodity ')
-                        .replace('fuel', 'Fuel')}
-                      :
-                    </span>
-                    <span className="w-16 text-yellow-300 text-xs">
-                      Price: {price}
-                    </span>
-                    <button
-                      className="px-2 py-1 bg-red-700 rounded hover:bg-red-600 text-lg font-bold"
-                      onClick={() => handleSell(resource)}
-                    >
-                      Sell
-                    </button>
-                    <span className="w-8 text-center">{quantity}</span>
-                    <button
-                      className="px-2 py-1 bg-green-700 rounded hover:bg-green-600 text-lg font-bold"
-                      onClick={() => handleBuy(resource)}
-                    >
-                      Buy
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <span className="capitalize font-bold">{resource}</span>
+                      <span className="text-yellow-300">${price}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="px-2 py-1 bg-red-700 rounded hover:bg-red-600 text-xs font-bold"
+                        onClick={() => handleSell(resource)}
+                        disabled={quantity <= 0}
+                      >
+                        Sell
+                      </button>
+                      <span className="w-8 text-center text-white">
+                        {quantity}
+                      </span>
+                      <button
+                        className="px-2 py-1 bg-green-700 rounded hover:bg-green-600 text-xs font-bold"
+                        onClick={() => handleBuy(resource)}
+                        disabled={money < price}
+                      >
+                        Buy
+                      </button>
+                    </div>
                   </div>
                 )
               })}
