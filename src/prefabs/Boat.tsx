@@ -66,6 +66,8 @@ export const Boat = ({
       if (tRef.current >= 1) {
         tRef.current = 0
         setBezierPath({ bezierPath: null })
+        // Show destination modal when boat arrives
+        useGameStore.getState().setShowDestinationModal(true)
       }
       return
     }

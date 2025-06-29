@@ -100,12 +100,12 @@ export interface GameState {
     end: [number, number]
   } | null
   moveBoatToDock: (index: number) => void
-  moveBoatToNextDock: () => void
-  moveBoatToPrevDock: () => void
   setBoatState: (state: { x: number; y: number; angle: number }) => void
   lighthouseEditMode: 'translate' | 'rotate'
   setLighthouseEditMode: (mode: 'translate' | 'rotate') => void
   saveLighthousePositions: () => void
+  showDestinationModal: boolean
+  setShowDestinationModal: (show: boolean) => void
 }
 
 export const useGameStore = create<GameState>((set, get) => {
@@ -135,7 +135,8 @@ export const useGameStore = create<GameState>((set, get) => {
     islands,
     currentDockingIndex: 0,
     bezierPath: null,
-    lighthouseEditMode: 'translate',
+    lighthouseEditMode: 'translate' as 'translate' | 'rotate',
+    showDestinationModal: true,
     moveBoatToDock: (index: number) => {
       const island = get().islands[index]
       if (!island) return
@@ -163,62 +164,9 @@ export const useGameStore = create<GameState>((set, get) => {
         currentDockingIndex: index,
       })
     },
-    moveBoatToNextDock: () => {
-      const { currentDockingIndex, islands } = get()
-      const current = islands[currentDockingIndex]
-      if (!current) return
-      // Find the closest dock that is not the current one
-      let minDist = Infinity
-      let minIdx = currentDockingIndex
-      for (let i = 0; i < islands.length; i++) {
-        if (i === currentDockingIndex) continue
-        const d = distance(
-          [
-            current.x + current.dockingPoint.dx,
-            current.y + current.dockingPoint.dy,
-          ],
-          [
-            islands[i].x + islands[i].dockingPoint.dx,
-            islands[i].y + islands[i].dockingPoint.dy,
-          ],
-        )
-        if (d < minDist) {
-          minDist = d
-          minIdx = i
-        }
-      }
-      get().moveBoatToDock(minIdx)
-    },
-    moveBoatToPrevDock: () => {
-      const { currentDockingIndex, islands } = get()
-      const current = islands[currentDockingIndex]
-      if (!current) return
-      // Find the second closest dock (for prev, just as an example)
-      // Get all distances
-      const distances = islands.map((island, i) => ({
-        i,
-        d:
-          i === currentDockingIndex
-            ? Infinity
-            : distance(
-                [
-                  current.x + current.dockingPoint.dx,
-                  current.y + current.dockingPoint.dy,
-                ],
-                [
-                  island.x + island.dockingPoint.dx,
-                  island.y + island.dockingPoint.dy,
-                ],
-              ),
-      }))
-      // Sort by distance
-      distances.sort((a, b) => a.d - b.d)
-      // Pick the second closest (if exists), else fallback to closest
-      const prevIdx = distances[1]?.i ?? distances[0].i
-      get().moveBoatToDock(prevIdx)
-    },
     setBoatState: (state) => set({ boatState: state }),
     setLighthouseEditMode: (mode) => set({ lighthouseEditMode: mode }),
+    setShowDestinationModal: (show) => set({ showDestinationModal: show }),
     saveLighthousePositions: () => {
       const positions = get().islands.map((island) => ({
         offsetX: island.offsetX,

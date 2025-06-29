@@ -5,16 +5,12 @@ import { Boat } from '../prefabs/Boat'
 import { CameraControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { useGameStore } from '../store/gameStore'
-import { useKeyboardInput } from '../hooks/useKeyboardInput'
 import { Island } from '../prefabs/Island'
 
 export const DefaultScene = () => {
   const { controls } = useThree()
   const boatPos = useGameStore((s) => s.boatState)
   const setBoatState = useGameStore((s) => s.setBoatState)
-  const moveBoatToNextDock = useGameStore((s) => s.moveBoatToNextDock)
-  const moveBoatToPrevDock = useGameStore((s) => s.moveBoatToPrevDock)
-  const keys = useKeyboardInput(['ArrowLeft', 'ArrowRight'])
   const lighthouseEditMode = useGameStore((s) => s.lighthouseEditMode)
   const setLighthouseEditMode = useGameStore((s) => s.setLighthouseEditMode)
   const saveLighthousePositions = useGameStore((s) => s.saveLighthousePositions)
@@ -31,12 +27,6 @@ export const DefaultScene = () => {
   useEffect(() => {
     updateCamera()
   }, [updateCamera])
-
-  useEffect(() => {
-    if (keys.arrowright) moveBoatToNextDock()
-    if (keys.arrowleft) moveBoatToPrevDock()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keys.arrowright, keys.arrowleft])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
