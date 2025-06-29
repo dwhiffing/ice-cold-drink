@@ -62,6 +62,8 @@ function generateIslands({
         dockingPoint: overrides[i]?.dockingPoint ?? { dx: 0, dy: 0 },
         neighbours: [], // will be filled in next step
         beziers: {}, // will be filled in next step
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        bezierOverrides: (overrides[i]?.bezierOverrides as any) ?? {},
       })
     }
   }
@@ -79,7 +81,7 @@ function generateIslands({
     island.neighbours = dists.filter((d) => d.dist < 200).map((d) => d.idx)
   })
   // Precompute cubic bezier curves for all neighbours
-  islands.forEach((island) => {
+  islands.forEach((island, i) => {
     island.beziers = {}
     island.neighbours.forEach((j) => {
       const other = islands[j]
@@ -91,20 +93,31 @@ function generateIslands({
         other.x + other.dockingPoint.dx,
         other.y + other.dockingPoint.dy,
       ]
-      // Handles: control1 near start, control2 near end
-      const dx = end[0] - start[0]
-      const dy = end[1] - start[1]
-      const len = Math.sqrt(dx * dx + dy * dy)
-      // Perpendicular for curve
-      const perp = [-(dy / len), dx / len]
-      // Control points offset from start/end
-      const handleLen = len * 0.25
-      const control: [number, number] = [
-        start[0] + dx * 0.5 + perp[0] * handleLen * 0.5,
-        start[1] + dy * 0.5 + perp[1] * handleLen * 0.5,
-      ]
-
-      island.beziers[j] = { start, control, end }
+      let control1, control2
+      // Load bezier handles from overrides if present
+      const bezierOverrides = overrides[i]?.bezierOverrides as Record<
+        number,
+        { control1: [number, number]; control2: [number, number] }
+      >
+      if (bezierOverrides && bezierOverrides[j]) {
+        control1 = bezierOverrides[j].control1
+        control2 = bezierOverrides[j].control2
+      } else {
+        const dx = end[0] - start[0]
+        const dy = end[1] - start[1]
+        const len = Math.sqrt(dx * dx + dy * dy)
+        const perp = [-(dy / len), dx / len]
+        const handleLen = len * 0.25
+        control1 = [
+          start[0] + dx * 0.1 + perp[0] * handleLen * 0.5,
+          start[1] + dy * 0.1 + perp[1] * handleLen * 0.5,
+        ] as [number, number]
+        control2 = [
+          start[0] + dx * 0.9 + perp[0] * handleLen * 0.5,
+          start[1] + dy * 0.9 + perp[1] * handleLen * 0.5,
+        ] as [number, number]
+      }
+      island.beziers[j] = { start, control1, control2, end }
     })
   })
   return islands
@@ -125,10 +138,18 @@ export interface IslandData {
   lighthousePosition: { x: number; y: number }
   lighthouseRotation: { y: number }
   neighbours: number[]
+  bezierOverrides: Record<
+    number,
+    {
+      control1: [number, number]
+      control2: [number, number]
+    }
+  >
   beziers: {
     [neighbourIdx: number]: {
       start: [number, number]
-      control: [number, number]
+      control1: [number, number]
+      control2: [number, number]
       end: [number, number]
     }
   }
@@ -147,7 +168,8 @@ export interface GameState {
   currentDockingIndex: number
   bezierPath: {
     start: [number, number]
-    control: [number, number]
+    control1: [number, number]
+    control2: [number, number]
     end: [number, number]
   } | null
   moveBoatToDock: (index: number) => void
@@ -212,6 +234,12 @@ export const useGameStore = create<GameState>((set, get) => {
           rotation: { y: island.lighthouseRotation?.y ?? 0 },
         },
         dockingPoint: island.dockingPoint,
+        bezierOverrides: Object.fromEntries(
+          Object.entries(island.beziers).map(([k, v]) => [
+            k,
+            { control1: v.control1, control2: v.control2 },
+          ]),
+        ),
       }))
       console.log('Saving overrides:', positions)
       navigator.clipboard.writeText(JSON.stringify(positions, null, 2))

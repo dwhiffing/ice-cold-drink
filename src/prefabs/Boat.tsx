@@ -24,16 +24,24 @@ export const Boat = ({
   const bezierPath = useGameStore((s) => s.bezierPath)
   const tRef = useRef(0)
 
-  function bezierInterp(
+  function cubicBezierInterp(
     t: number,
     p0: [number, number],
     p1: [number, number],
     p2: [number, number],
+    p3: [number, number],
   ) {
+    const mt = 1 - t
     const x =
-      (1 - t) * (1 - t) * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0]
+      mt * mt * mt * p0[0] +
+      3 * mt * mt * t * p1[0] +
+      3 * mt * t * t * p2[0] +
+      t * t * t * p3[0]
     const y =
-      (1 - t) * (1 - t) * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1]
+      mt * mt * mt * p0[1] +
+      3 * mt * mt * t * p1[1] +
+      3 * mt * t * t * p2[1] +
+      t * t * t * p3[1]
     return [x, y]
   }
 
@@ -52,19 +60,21 @@ export const Boat = ({
       const speed = 0.001
       tRef.current = Math.min(1, tRef.current + speed)
       const tEased = easeInOut(tRef.current)
-      const [bx, by] = bezierInterp(
+      const [bx, by] = cubicBezierInterp(
         tEased,
         bezierPath.start,
-        bezierPath.control,
+        bezierPath.control1,
+        bezierPath.control2,
         bezierPath.end,
       )
       // Compute tangent for angle
       const t2 = Math.min(1, tRef.current + 0.01)
       const t2Eased = easeInOut(t2)
-      const [bx2, by2] = bezierInterp(
+      const [bx2, by2] = cubicBezierInterp(
         t2Eased,
         bezierPath.start,
-        bezierPath.control,
+        bezierPath.control1,
+        bezierPath.control2,
         bezierPath.end,
       )
       const angle = Math.atan2(bx2 - bx, by2 - by) + Math.PI / 2
