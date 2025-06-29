@@ -71,6 +71,7 @@ export interface IslandData {
 
 export interface GameState {
   boatState: { x: number; y: number; angle: number }
+  boatTarget: { x: number; y: number; angle: number }
   count: number
   seed: number
   spread: number
@@ -83,13 +84,14 @@ export interface GameState {
   moveBoatToDock: (index: number) => void
   moveBoatToNextDock: () => void
   moveBoatToPrevDock: () => void
+  setBoatState: (state: { x: number; y: number; angle: number }) => void
 }
 
 export const useGameStore = create<GameState>((set, get) => {
   const count = 50
   const seed = 12345
-  const spread = 2000
-  const buffer = 240
+  const spread = 200
+  const buffer = 40
   const maxTries = 1000
   const drawDistance = 500
   const islands = generateIslands({ count, seed, spread, buffer, maxTries })
@@ -102,6 +104,7 @@ export const useGameStore = create<GameState>((set, get) => {
 
   return {
     boatState: initialBoat,
+    boatTarget: initialBoat,
     count,
     seed,
     spread,
@@ -114,24 +117,76 @@ export const useGameStore = create<GameState>((set, get) => {
     moveBoatToDock: (index: number) => {
       const island = get().islands[index]
       if (!island) return
+      const { boatState } = get()
+      const targetX = island.x + island.dockingPoint.dx
+      const targetY = island.y + island.dockingPoint.dy
+      // Calculate angle to face direction of travel
+      const dx = targetX - boatState.x
+      const dy = targetY - boatState.y
+      const angle = Math.atan2(dx, dy)
       set({
-        boatState: {
-          x: island.x + island.dockingPoint.dx,
-          y: island.y + island.dockingPoint.dy,
-          angle: Math.PI * 0.5,
+        boatTarget: {
+          x: targetX,
+          y: targetY,
+          angle,
         },
         currentDockingIndex: index,
       })
     },
     moveBoatToNextDock: () => {
       const { currentDockingIndex, islands } = get()
-      const next = (currentDockingIndex + 1) % islands.length
-      get().moveBoatToDock(next)
+      const current = islands[currentDockingIndex]
+      if (!current) return
+      // Find the closest dock that is not the current one
+      let minDist = Infinity
+      let minIdx = currentDockingIndex
+      for (let i = 0; i < islands.length; i++) {
+        if (i === currentDockingIndex) continue
+        const d = distance(
+          [
+            current.x + current.dockingPoint.dx,
+            current.y + current.dockingPoint.dy,
+          ],
+          [
+            islands[i].x + islands[i].dockingPoint.dx,
+            islands[i].y + islands[i].dockingPoint.dy,
+          ],
+        )
+        if (d < minDist) {
+          minDist = d
+          minIdx = i
+        }
+      }
+      get().moveBoatToDock(minIdx)
     },
     moveBoatToPrevDock: () => {
       const { currentDockingIndex, islands } = get()
-      const prev = (currentDockingIndex - 1 + islands.length) % islands.length
-      get().moveBoatToDock(prev)
+      const current = islands[currentDockingIndex]
+      if (!current) return
+      // Find the second closest dock (for prev, just as an example)
+      // Get all distances
+      const distances = islands.map((island, i) => ({
+        i,
+        d:
+          i === currentDockingIndex
+            ? Infinity
+            : distance(
+                [
+                  current.x + current.dockingPoint.dx,
+                  current.y + current.dockingPoint.dy,
+                ],
+                [
+                  island.x + island.dockingPoint.dx,
+                  island.y + island.dockingPoint.dy,
+                ],
+              ),
+      }))
+      // Sort by distance
+      distances.sort((a, b) => a.d - b.d)
+      // Pick the second closest (if exists), else fallback to closest
+      const prevIdx = distances[1]?.i ?? distances[0].i
+      get().moveBoatToDock(prevIdx)
     },
+    setBoatState: (state) => set({ boatState: state }),
   }
 })

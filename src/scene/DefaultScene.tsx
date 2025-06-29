@@ -11,6 +11,8 @@ import { useKeyboardInput } from '../hooks/useKeyboardInput'
 export const DefaultScene = () => {
   const { controls } = useThree()
   const boatPos = useGameStore((s) => s.boatState)
+  const boatTarget = useGameStore((s) => s.boatTarget)
+  const setBoatState = useGameStore((s) => s.setBoatState)
   const moveBoatToNextDock = useGameStore((s) => s.moveBoatToNextDock)
   const moveBoatToPrevDock = useGameStore((s) => s.moveBoatToPrevDock)
   const keys = useKeyboardInput(['ArrowLeft', 'ArrowRight'])
@@ -47,7 +49,13 @@ export const DefaultScene = () => {
 
       <Water />
       <Islands />
-      <Boat x={boatPos.x} y={boatPos.y} angle={boatPos.angle} />
+      <Boat
+        x={boatPos.x}
+        y={boatPos.y}
+        angle={boatPos.angle}
+        target={boatTarget}
+        setBoatState={setBoatState}
+      />
       <CameraControls
         makeDefault
         mouseButtons={{ left: 1, middle: 16, right: 0, wheel: 16 }}
