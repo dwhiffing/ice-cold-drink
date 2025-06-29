@@ -56,7 +56,7 @@ function generateIslands({
     if (ok) {
       // Assign prices for all resources
       const prices: { [key: string]: number; fuel: number } = {
-        fuel: 5,
+        fuel: 5 + rand() * 0,
       }
       COMMODITIES.forEach((c) => {
         // Each island gets a price for each commodity, randomizing around its base value
