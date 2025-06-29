@@ -112,11 +112,11 @@ export const PulsingLight = (props: {
 }) => {
   return (
     <mesh position={props.position}>
-      <sphereGeometry args={[1, 16, 16]} />
+      <sphereGeometry args={[3.5, 16, 16]} />
       <FakeGlowMaterial
         glowColor="#ff0000"
-        glowInternalRadius={2}
-        falloff={1}
+        glowInternalRadius={1}
+        falloff={2}
       />
     </mesh>
   )

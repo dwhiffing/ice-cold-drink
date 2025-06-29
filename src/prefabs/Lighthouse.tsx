@@ -9,7 +9,7 @@ export const Lighthouse = () => {
   return (
     <group>
       <primitive position={[0, 0.5, 0]} scale={1} object={clone(obj.scene)} />
-      <PulsingLight color="#ff0000" position={[0, 8.8, 0]} />
+      <PulsingLight color="#ff0000" position={[0, 9.5, 0]} />
     </group>
   )
 }
