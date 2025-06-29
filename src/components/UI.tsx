@@ -163,7 +163,7 @@ export const DestinationModal = () => {
       <div
         className={`${
           isOpen ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
-        } transition-opacity fixed inset-0 bg-black/70 flex items-center justify-center z-[200]`}
+        } transition-opacity fixed inset-0 bg-black/70 flex items-center justify-center z-[200] px-5`}
         style={{ transitionDuration: `${DURATION}ms` }}
       >
         <div className="bg-zinc-900 text-white p-8 rounded-xl min-w-80 shadow-2xl text-center relative">
@@ -177,10 +177,10 @@ export const DestinationModal = () => {
           <h2 className="text-3xl font-bold mb-4">
             {islands[currentDockingIndex].name}
           </h2>
-          <div className="text-lg font-bold mb-3 text-green-500">
+          <div className="text-lg font-bold mb-3 text-yellow-500">
             Money: ${money}
           </div>
-          <div className="mb-4 grid grid-cols-2 gap-4">
+          <div className="mb-4 grid sm:grid-cols-2 gap-2 sm:gap-4">
             {inventory
               .map((item) => item.name)
               .map((resource) => {
@@ -198,7 +198,7 @@ export const DestinationModal = () => {
                 return (
                   <div
                     key={resource}
-                    className={`flex flex-col items-center justify-center gap-2 mb-2 ${color}`}
+                    className={`flex flex-col items-center justify-center gap-2 ${color}`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="capitalize font-bold">{resource}</span>
@@ -228,7 +228,9 @@ export const DestinationModal = () => {
               })}
           </div>
           <h2 className="text-lg font-bold mb-2">Select Destination</h2>
-          <ul className="flex gap-4">{destinationListItems}</ul>
+          <ul className="flex flex-wrap justify-center gap-4">
+            {destinationListItems}
+          </ul>
         </div>
       </div>
     </>
