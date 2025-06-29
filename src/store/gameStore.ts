@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import overrides from '../overrides.json'
 
 function mulberry32(seed: number) {
   return function () {
@@ -51,6 +52,11 @@ function generateIslands({
         size: 1.3,
         noise: 9,
         curve: 1.1,
+        lighthousePosition: overrides[i]?.lighthouse.position ?? { x: 0, y: 0 },
+        lighthouseRotation:
+          overrides[i]?.lighthouse.rotation?.y !== undefined
+            ? { y: overrides[i].lighthouse.rotation.y }
+            : { y: 0 },
         dockingPoint: { dx: -3, dy: 0 },
       })
     }
@@ -67,6 +73,8 @@ export interface IslandData {
   noise: number
   curve: number
   dockingPoint: { dx: number; dy: number }
+  lighthousePosition: { x: number; y: number }
+  lighthouseRotation: { y: number }
 }
 
 export interface GameState {
@@ -85,6 +93,9 @@ export interface GameState {
   moveBoatToNextDock: () => void
   moveBoatToPrevDock: () => void
   setBoatState: (state: { x: number; y: number; angle: number }) => void
+  lighthouseEditMode: 'translate' | 'rotate'
+  setLighthouseEditMode: (mode: 'translate' | 'rotate') => void
+  saveLighthousePositions: () => void
 }
 
 export const useGameStore = create<GameState>((set, get) => {
@@ -114,6 +125,7 @@ export const useGameStore = create<GameState>((set, get) => {
     showDockingPoints: true,
     islands,
     currentDockingIndex: 0,
+    lighthouseEditMode: 'translate',
     moveBoatToDock: (index: number) => {
       const island = get().islands[index]
       if (!island) return
@@ -188,5 +200,16 @@ export const useGameStore = create<GameState>((set, get) => {
       get().moveBoatToDock(prevIdx)
     },
     setBoatState: (state) => set({ boatState: state }),
+    setLighthouseEditMode: (mode) => set({ lighthouseEditMode: mode }),
+    saveLighthousePositions: () => {
+      const positions = get().islands.map((island) => ({
+        lighthouse: {
+          position: island.lighthousePosition,
+          rotation: { y: island.lighthouseRotation?.y ?? 0 },
+        },
+      }))
+      console.log('Saving overrides:', positions)
+      navigator.clipboard.writeText(JSON.stringify(positions, null, 2))
+    },
   }
 })
