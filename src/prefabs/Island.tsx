@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import crusoe from 'crusoe'
+// @ts-expect-error yes
+import { crusoe } from '../crusoe.js'
 import { useMemo } from 'react'
 import { Lighthouse } from './Lighthouse'
 import { DebugTransform } from '../components/DebugTransform'
