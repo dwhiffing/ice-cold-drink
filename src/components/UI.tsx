@@ -1,13 +1,34 @@
 import { ReactNode, useMemo, useCallback, useState, useEffect } from 'react'
 import { useGameStore } from '../store/gameStore'
+import { timescale, setTimescale } from '../utils/constants'
 
 const DURATION = 1000
 export const UI = ({ children }: { children: ReactNode }) => {
   const inventory = useGameStore((s) => s.inventory)
   const money = useGameStore((s) => s.money)
 
+  const [fastMode, setFastMode] = useState(timescale > 1)
+
+  const handleToggleFastMode = () => {
+    if (timescale === 1) {
+      setTimescale(5)
+      setFastMode(true)
+    } else {
+      setTimescale(1)
+      setFastMode(false)
+    }
+  }
+
   return (
     <div className="pointer-events-none absolute top-0 left-0 w-screen h-screen flex z-[100]">
+      <button
+        className="pointer-events-auto absolute top-4 right-4 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded font-bold shadow z-[200]"
+        style={{ minWidth: 90 }}
+        onClick={handleToggleFastMode}
+      >
+        {fastMode ? 'Fast mode' : 'Slow mode'}
+      </button>
+
       <div className="flex flex-col gap-1 text-white p-2">
         <div className="text-sm">Money: ${money}</div>
         {inventory
@@ -154,7 +175,7 @@ export const DestinationModal = () => {
     <>
       {!localShowDestinationModal && (
         <button
-          className="pointer-events-auto absolute top-4 right-4 px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
+          className="pointer-events-auto absolute top-16 right-4 px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 font-bold"
           onClick={() => setLocalShowDestinationModal(true)}
         >
           Show Inventory

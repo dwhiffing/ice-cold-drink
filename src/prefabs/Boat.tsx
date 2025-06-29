@@ -3,7 +3,7 @@ import { useLoader, useFrame } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import { MTLLoader, OBJLoader } from 'three/examples/jsm/Addons.js'
 import { useGameStore } from '../store/gameStore'
-import { BOAT_ROTATE_SPEED, BOAT_SPEED } from '../utils/constants'
+import { BOAT_ROTATE_SPEED, BOAT_SPEED, timescale } from '../utils/constants'
 
 export const Boat = ({
   x,
@@ -78,7 +78,7 @@ export const Boat = ({
   useFrame(() => {
     if (bezierPath) {
       if (isRotating.current) {
-        const rotationSpeed = BOAT_ROTATE_SPEED
+        const rotationSpeed = BOAT_ROTATE_SPEED * timescale
         let diff = targetAngle.current - stateRef.current.angle
         diff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI
         if (Math.abs(diff) < 0.01) {
@@ -101,7 +101,7 @@ export const Boat = ({
         return
       }
       if (isRotating.current) return
-      const speed = BOAT_SPEED
+      const speed = BOAT_SPEED * timescale
       if (encounterTiming !== null && tRef.current < 1) {
         if (
           tRef.current < encounterTiming &&

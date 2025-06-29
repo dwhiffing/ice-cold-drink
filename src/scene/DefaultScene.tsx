@@ -56,7 +56,7 @@ export const DefaultScene = () => {
       useGameStore.setState({
         showDestinationModal: true,
       })
-    }, 800)
+    }, 1500)
   }, [])
 
   return (

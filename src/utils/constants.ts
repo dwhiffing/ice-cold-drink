@@ -1,13 +1,16 @@
 export const DEBUG = false
 export const FOG_DISTANCE = 60
 export const STARTING_ISLAND = 0
-export const STARTING_MONEY = 100
-export const STARTING_FUEL = 10
-export const TIMESCALE = 1
+export const STARTING_MONEY = 25
+export const STARTING_FUEL = 1000
+export let timescale = 1
+export const setTimescale = (v: number) => {
+  timescale = v
+}
 export const DUR = 1000
-export const BOAT_SPEED = 0.0005 * TIMESCALE
-export const BOAT_ROTATE_SPEED = 0.01 * TIMESCALE
-export const FUEL_UNIT_DISTANCE = 100
+export const BOAT_SPEED = 0.0005
+export const BOAT_ROTATE_SPEED = 0.01
+export const FUEL_UNIT_DISTANCE = 150
 export const NEIGHBOUR_DISTANCE = 600
 export const PRIMARY_COLOR = '#557582'
 
