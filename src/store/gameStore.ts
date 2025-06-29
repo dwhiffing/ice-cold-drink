@@ -50,7 +50,6 @@ function generateIslands({
         offsetY: overrides[i]?.offsetY ?? 0,
         offsetZ: overrides[i]?.offsetZ ?? 0,
         seed: 0,
-        // seed: i,
         elevation: 1,
         size: 1.3,
         noise: 9,
@@ -61,9 +60,53 @@ function generateIslands({
             ? { y: overrides[i].lighthouse.rotation.y }
             : { y: 0 },
         dockingPoint: overrides[i]?.dockingPoint ?? { dx: 0, dy: 0 },
+        neighbours: [], // will be filled in next step
+        beziers: {}, // will be filled in next step
       })
     }
   }
+  // Compute neighbours for each island
+  islands.forEach((island, idx) => {
+    const dists = islands
+      .map((other, j) => ({
+        idx: j,
+        dist:
+          idx === j
+            ? Infinity
+            : distance([island.x, island.y], [other.x, other.y]),
+      }))
+      .sort((a, b) => a.dist - b.dist)
+    island.neighbours = dists.filter((d) => d.dist < 200).map((d) => d.idx)
+  })
+  // Precompute cubic bezier curves for all neighbours
+  islands.forEach((island) => {
+    island.beziers = {}
+    island.neighbours.forEach((j) => {
+      const other = islands[j]
+      const start: [number, number] = [
+        island.x + island.dockingPoint.dx,
+        island.y + island.dockingPoint.dy,
+      ]
+      const end: [number, number] = [
+        other.x + other.dockingPoint.dx,
+        other.y + other.dockingPoint.dy,
+      ]
+      // Handles: control1 near start, control2 near end
+      const dx = end[0] - start[0]
+      const dy = end[1] - start[1]
+      const len = Math.sqrt(dx * dx + dy * dy)
+      // Perpendicular for curve
+      const perp = [-(dy / len), dx / len]
+      // Control points offset from start/end
+      const handleLen = len * 0.25
+      const control: [number, number] = [
+        start[0] + dx * 0.5 + perp[0] * handleLen * 0.5,
+        start[1] + dy * 0.5 + perp[1] * handleLen * 0.5,
+      ]
+
+      island.beziers[j] = { start, control, end }
+    })
+  })
   return islands
 }
 
@@ -81,6 +124,14 @@ export interface IslandData {
   dockingPoint: { dx: number; dy: number }
   lighthousePosition: { x: number; y: number }
   lighthouseRotation: { y: number }
+  neighbours: number[]
+  beziers: {
+    [neighbourIdx: number]: {
+      start: [number, number]
+      control: [number, number]
+      end: [number, number]
+    }
+  }
 }
 
 export interface GameState {
@@ -138,29 +189,13 @@ export const useGameStore = create<GameState>((set, get) => {
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
     showDestinationModal: true,
     moveBoatToDock: (index: number) => {
-      const island = get().islands[index]
-      if (!island) return
-      const { boatState } = get()
-      const start: [number, number] = [boatState.x, boatState.y]
-      const end: [number, number] = [
-        island.x + island.dockingPoint.dx,
-        island.y + island.dockingPoint.dy,
-      ]
-      // Control point: midpoint plus perpendicular offset for curve
-      const mx = (start[0] + end[0]) / 2
-      const my = (start[1] + end[1]) / 2
-      const dx = end[0] - start[0]
-      const dy = end[1] - start[1]
-      const len = Math.sqrt(dx * dx + dy * dy)
-      // Perpendicular offset (10% of distance)
-      const perp = [my - start[1], start[0] - mx]
-      const norm = Math.sqrt(perp[0] * perp[0] + perp[1] * perp[1]) || 1
-      const control: [number, number] = [
-        mx + (perp[0] / norm) * len * 0.2,
-        my + (perp[1] / norm) * len * 0.2,
-      ]
+      const islands = get().islands
+      const currentIdx = get().currentDockingIndex
+      const currentIsland = islands[currentIdx]
+      const bezier = currentIsland.beziers[index]
+      if (!bezier) return
       set({
-        bezierPath: { start, control, end },
+        bezierPath: bezier,
         currentDockingIndex: index,
       })
     },

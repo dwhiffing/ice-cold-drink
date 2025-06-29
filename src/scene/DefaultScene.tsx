@@ -6,6 +6,7 @@ import { CameraControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { useGameStore } from '../store/gameStore'
 import { Island } from '../prefabs/Island'
+import { BezierRenderer } from '../components/BezierRenderer'
 
 export const DefaultScene = () => {
   const { controls } = useThree()
@@ -86,6 +87,9 @@ export const DefaultScene = () => {
         maxDistance={35}
         minDistance={5}
       />
+
+      {/* Render all bezier paths between island neighbours */}
+      <BezierRenderer islands={islands} />
     </>
   )
 }

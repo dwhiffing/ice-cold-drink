@@ -37,6 +37,11 @@ export const Boat = ({
     return [x, y]
   }
 
+  function easeInOut(t: number) {
+    // Cubic ease-in-out
+    return t * t * (3 - 2 * t)
+  }
+
   const setBezierPath = useGameStore.setState as (
     state: Partial<{ bezierPath: null }>,
   ) => void
@@ -44,18 +49,20 @@ export const Boat = ({
   useFrame(() => {
     if (bezierPath) {
       // Animate t from 0 to 1 based on speed
-      const speed = 0.01
+      const speed = 0.001
       tRef.current = Math.min(1, tRef.current + speed)
+      const tEased = easeInOut(tRef.current)
       const [bx, by] = bezierInterp(
-        tRef.current,
+        tEased,
         bezierPath.start,
         bezierPath.control,
         bezierPath.end,
       )
       // Compute tangent for angle
       const t2 = Math.min(1, tRef.current + 0.01)
+      const t2Eased = easeInOut(t2)
       const [bx2, by2] = bezierInterp(
-        t2,
+        t2Eased,
         bezierPath.start,
         bezierPath.control,
         bezierPath.end,
