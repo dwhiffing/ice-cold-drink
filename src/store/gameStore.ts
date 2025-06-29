@@ -46,6 +46,9 @@ function generateIslands({
       islands.push({
         x: ix,
         y: iy,
+        offsetX: overrides[i]?.offsetX ?? 0,
+        offsetY: overrides[i]?.offsetY ?? 0,
+        offsetZ: overrides[i]?.offsetZ ?? 0,
         seed: 0,
         // seed: i,
         elevation: 1,
@@ -67,6 +70,9 @@ function generateIslands({
 export interface IslandData {
   x: number
   y: number
+  offsetX: number
+  offsetY: number
+  offsetZ: number
   seed: number
   elevation: number
   size: number
@@ -203,6 +209,9 @@ export const useGameStore = create<GameState>((set, get) => {
     setLighthouseEditMode: (mode) => set({ lighthouseEditMode: mode }),
     saveLighthousePositions: () => {
       const positions = get().islands.map((island) => ({
+        offsetX: island.offsetX,
+        offsetY: island.offsetY,
+        offsetZ: island.offsetZ,
         lighthouse: {
           position: island.lighthousePosition,
           rotation: { y: island.lighthouseRotation?.y ?? 0 },

@@ -8,6 +8,9 @@ import { useGameStore } from '../store/gameStore'
 const RESOLUTION = 42
 
 export function Island({
+  offsetX,
+  offsetY,
+  offsetZ,
   x,
   y,
   seed,
@@ -23,6 +26,9 @@ export function Island({
 }: {
   x: number
   y: number
+  offsetX: number
+  offsetY: number
+  offsetZ: number
   index: number
   seed: number
   elevation: number
@@ -74,6 +80,23 @@ export function Island({
     setIslands({ islands: newIslands })
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChangeIslandPosition = (e: any) => {
+    if (!e || !e.target?.object?.position) return
+    const pos = e.target.object.position
+    const newIslands = islands.map((island, i) =>
+      i === index
+        ? {
+            ...island,
+            offsetX: pos.x - x,
+            offsetY: pos.y,
+            offsetZ: pos.z - y,
+          }
+        : island,
+    )
+    setIslands({ islands: newIslands })
+  }
+
   const { geometry, material } = useMemo(() => {
     const map = crusoe.generateMap({
       seed,
@@ -110,13 +133,21 @@ export function Island({
 
   return (
     <>
-      <mesh
-        geometry={geometry}
-        material={material}
-        position={[x, 0, y]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[2, 2, 2]}
-      />
+      <TransformControls
+        position={[x + offsetX, offsetY, y + offsetZ]}
+        mode="translate"
+        onMouseUp={handleChangeIslandPosition}
+        showX={true}
+        showY={true}
+        showZ={true}
+      >
+        <mesh
+          geometry={geometry}
+          material={material}
+          rotation={[-Math.PI / 2, 0, 0]}
+          scale={[2, 2, 2]}
+        />
+      </TransformControls>
 
       {showDockingPoint && (
         <TransformControls
@@ -135,7 +166,7 @@ export function Island({
       )}
 
       <TransformControls
-        position={[x + lighthousePosition.x, 0, y + lighthousePosition.y]}
+        position={[x + lighthousePosition.x, -0.3, y + lighthousePosition.y]}
         rotation={[0, lighthouseRotation.y, 0]}
         mode={mode}
         onMouseUp={handleChange}

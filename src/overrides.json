@@ -1,20 +1,26 @@
 [
   {
+    "offsetX": -2.3623236363952174,
+    "offsetY": -0.9662527593772929,
+    "offsetZ": -2.9096077527220316,
     "lighthouse": {
       "position": {
-        "x": -7.04149005643103,
-        "y": 16.48200064012926
+        "x": -8.417277548793962,
+        "y": 12.626887943138414
       },
       "rotation": {
         "y": -0.6257778831497779
       }
     },
     "dockingPoint": {
-      "dx": -11.387518246615784,
-      "dy": 15.125577143529622
+      "dx": -11.568245275558212,
+      "dy": 11.668688114017385
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -30,6 +36,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -45,6 +54,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -60,6 +72,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -75,6 +90,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -90,6 +108,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -105,6 +126,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -120,6 +144,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -135,6 +162,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -150,6 +180,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -165,6 +198,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -180,6 +216,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -195,6 +234,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -210,6 +252,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -225,6 +270,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -240,6 +288,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -255,6 +306,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -270,6 +324,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -285,6 +342,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -300,6 +360,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
@@ -315,6 +378,9 @@
     }
   },
   {
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
     "lighthouse": {
       "position": {
         "x": -3,
