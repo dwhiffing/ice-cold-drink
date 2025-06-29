@@ -78,15 +78,55 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
         return [x, 0.3, y]
       }).flat()
       curves.push(
-        <line key={key}>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              args={[new Float32Array(points), 3]}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial color="cyan" linewidth={2} />
-        </line>,
+        <>
+          <line key={key}>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                args={[new Float32Array(points), 3]}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial color="cyan" linewidth={2} />
+          </line>
+          <line>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                args={[
+                  new Float32Array([
+                    bezier.start[0],
+                    0.3,
+                    bezier.start[1],
+                    bezier.control1[0],
+                    0.3,
+                    bezier.control1[1],
+                  ]),
+                  3,
+                ]}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial color="yellow" linewidth={2} />
+          </line>
+          <line>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                args={[
+                  new Float32Array([
+                    bezier.end[0],
+                    0.3,
+                    bezier.end[1],
+                    bezier.control2[0],
+                    0.3,
+                    bezier.control2[1],
+                  ]),
+                  3,
+                ]}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial color="purple" linewidth={2} />
+          </line>
+        </>,
       )
       handles.push(
         <React.Fragment key={key + '-handles'}>
@@ -104,10 +144,12 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
               }
             }}
           >
-            <mesh key={key + '-control1'}>
-              <sphereGeometry args={[0.15, 12, 12]} />
-              <meshBasicMaterial color="red" />
-            </mesh>
+            <React.Fragment>
+              <mesh key={key + '-control1'}>
+                <sphereGeometry args={[0.15, 12, 12]} />
+                <meshBasicMaterial color="red" />
+              </mesh>
+            </React.Fragment>
           </DebugTransform>
           {/* End handle */}
           <DebugTransform
@@ -123,10 +165,12 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
               }
             }}
           >
-            <mesh key={key + '-control2'}>
-              <sphereGeometry args={[0.15, 12, 12]} />
-              <meshBasicMaterial color="blue" />
-            </mesh>
+            <React.Fragment>
+              <mesh key={key + '-control2'}>
+                <sphereGeometry args={[0.15, 12, 12]} />
+                <meshBasicMaterial color="blue" />
+              </mesh>
+            </React.Fragment>
           </DebugTransform>
         </React.Fragment>,
       )

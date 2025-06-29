@@ -1,6 +1,6 @@
-export const DEBUG = true
-export const FOG_DISTANCE = 600000
-export const STARTING_ISLAND = 9
+export const DEBUG = false
+export const FOG_DISTANCE = 60
+export const STARTING_ISLAND = 0
 export const TIMESCALE = 5
 export const DUR = 1000
 export const BOAT_SPEED = 0.0005 * TIMESCALE
