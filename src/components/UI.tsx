@@ -10,6 +10,7 @@ export const UI = ({ children }: { children: ReactNode }) => {
   const inventory = useGameStore((s) => s.inventory)
   const addToInventory = useGameStore((s) => s.addToInventory)
   const subtractFromInventory = useGameStore((s) => s.subtractFromInventory)
+  const encounterModal = useGameStore((s) => s.encounterModal)
 
   const [localShowDestinationModal, setLocalShowDestinationModal] =
     useState(true)
@@ -17,8 +18,12 @@ export const UI = ({ children }: { children: ReactNode }) => {
   const handleSelect = useCallback(
     (idx: number) => {
       setShowDestinationModal(false)
-      setLocalShowDestinationModal(true) // reset for next time
+      setLocalShowDestinationModal(true)
       moveBoatToDock(idx)
+
+      useGameStore.setState({
+        encounterTiming: Math.random() * 0.6 + 0.2,
+      })
     },
     [setShowDestinationModal, moveBoatToDock],
   )
@@ -123,6 +128,25 @@ export const UI = ({ children }: { children: ReactNode }) => {
             <ul className="grid grid-cols-3 p-0 gap-4">
               {destinationListItems}
             </ul>
+          </div>
+        </div>
+      )}
+      {encounterModal && (
+        <div className="pointer-events-auto fixed inset-0 bg-black/70 flex items-center justify-center z-[300]">
+          <div className="bg-zinc-900 text-white p-8 rounded-xl min-w-80 shadow-2xl text-center relative">
+            <h2 className="text-xl font-bold mb-4">Encounter</h2>
+            <div className="mb-4">{encounterModal.text}</div>
+            <div className="flex flex-col gap-2">
+              {encounterModal.options.map((opt, i) => (
+                <button
+                  key={i}
+                  className="px-4 py-2 rounded-md border-none bg-blue-600 text-white font-bold cursor-pointer text-lg hover:bg-blue-700 transition"
+                  onClick={opt.onSelect}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

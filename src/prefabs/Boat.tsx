@@ -23,6 +23,9 @@ export const Boat = ({
   const stateRef = useRef({ x, y, angle, speed: 0 })
   const bezierPath = useGameStore((s) => s.bezierPath)
   const tRef = useRef(0)
+  const encounterModal = useGameStore((s) => s.encounterModal)
+  const encounterTiming = useGameStore((s) => s.encounterTiming)
+  const triggerEncounter = useGameStore((s) => s.triggerEncounter)
 
   function cubicBezierInterp(
     t: number,
@@ -58,6 +61,19 @@ export const Boat = ({
     if (bezierPath) {
       // Animate t from 0 to 1 based on speed
       const speed = 0.001
+      if (encounterTiming !== null && tRef.current < 1) {
+        if (
+          tRef.current < encounterTiming &&
+          tRef.current + speed >= encounterTiming &&
+          !encounterModal
+        ) {
+          triggerEncounter()
+          return
+        }
+        if (tRef.current >= encounterTiming) {
+          return
+        }
+      }
       tRef.current = Math.min(1, tRef.current + speed)
       const tEased = easeInOut(tRef.current)
       const [bx, by] = cubicBezierInterp(

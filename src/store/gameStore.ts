@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import overrides from '../overrides.json'
-import { DEBUG } from '../utils/constants'
+import { DEBUG, ENCOUNTERS } from '../utils/constants'
 
 function mulberry32(seed: number) {
   return function () {
@@ -187,6 +187,12 @@ export interface GameState {
   subtractFromInventory: (name: string, amount: number) => void
   gameStarted: boolean
   setGameStarted: (started: boolean) => void
+  encounterTiming: number | null
+  encounterModal: null | {
+    text: string
+    options: { label: string; onSelect: () => void }[]
+  }
+  triggerEncounter: () => void
 }
 
 export const useGameStore = create<GameState>((set, get) => {
@@ -225,6 +231,8 @@ export const useGameStore = create<GameState>((set, get) => {
     fuelDistanceTraveled: 0,
     fuelUnitDistance: 50, // every 50 units, use 1 fuel
     gameStarted: DEBUG,
+    encounterTiming: null,
+    encounterModal: null,
   }
 
   return {
@@ -302,5 +310,25 @@ export const useGameStore = create<GameState>((set, get) => {
         ),
       })),
     setGameStarted: (started) => set({ gameStarted: started }),
+
+    triggerEncounter: () => {
+      const encounter =
+        ENCOUNTERS[Math.floor(Math.random() * ENCOUNTERS.length)]
+      set({
+        encounterModal: {
+          text: encounter.text,
+          options: encounter.options.map((opt) => ({
+            label: opt.label,
+            onSelect: () => {
+              opt.onSelect(get())
+              set({
+                encounterModal: null,
+                encounterTiming: null,
+              })
+            },
+          })),
+        },
+      })
+    },
   }
 })
