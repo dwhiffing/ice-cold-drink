@@ -85,7 +85,6 @@ export interface IslandData {
 
 export interface GameState {
   boatState: { x: number; y: number; angle: number }
-  boatTarget: { x: number; y: number; angle: number }
   count: number
   seed: number
   spread: number
@@ -95,6 +94,11 @@ export interface GameState {
   showDockingPoints: boolean
   islands: IslandData[]
   currentDockingIndex: number
+  bezierPath: {
+    start: [number, number]
+    control: [number, number]
+    end: [number, number]
+  } | null
   moveBoatToDock: (index: number) => void
   moveBoatToNextDock: () => void
   moveBoatToPrevDock: () => void
@@ -107,7 +111,7 @@ export interface GameState {
 export const useGameStore = create<GameState>((set, get) => {
   const count = 50
   const seed = 12345
-  const spread = 200
+  const spread = 900
   const buffer = 40
   const maxTries = 1000
   const drawDistance = 500
@@ -121,7 +125,6 @@ export const useGameStore = create<GameState>((set, get) => {
 
   return {
     boatState: initialBoat,
-    boatTarget: initialBoat,
     count,
     seed,
     spread,
@@ -131,23 +134,32 @@ export const useGameStore = create<GameState>((set, get) => {
     showDockingPoints: true,
     islands,
     currentDockingIndex: 0,
+    bezierPath: null,
     lighthouseEditMode: 'translate',
     moveBoatToDock: (index: number) => {
       const island = get().islands[index]
       if (!island) return
       const { boatState } = get()
-      const targetX = island.x + island.dockingPoint.dx
-      const targetY = island.y + island.dockingPoint.dy
-      // Calculate angle to face direction of travel
-      const dx = targetX - boatState.x
-      const dy = targetY - boatState.y
-      const angle = Math.atan2(dx, dy)
+      const start: [number, number] = [boatState.x, boatState.y]
+      const end: [number, number] = [
+        island.x + island.dockingPoint.dx,
+        island.y + island.dockingPoint.dy,
+      ]
+      // Control point: midpoint plus perpendicular offset for curve
+      const mx = (start[0] + end[0]) / 2
+      const my = (start[1] + end[1]) / 2
+      const dx = end[0] - start[0]
+      const dy = end[1] - start[1]
+      const len = Math.sqrt(dx * dx + dy * dy)
+      // Perpendicular offset (10% of distance)
+      const perp = [my - start[1], start[0] - mx]
+      const norm = Math.sqrt(perp[0] * perp[0] + perp[1] * perp[1]) || 1
+      const control: [number, number] = [
+        mx + (perp[0] / norm) * len * 0.2,
+        my + (perp[1] / norm) * len * 0.2,
+      ]
       set({
-        boatTarget: {
-          x: targetX,
-          y: targetY,
-          angle,
-        },
+        bezierPath: { start, control, end },
         currentDockingIndex: index,
       })
     },

@@ -11,7 +11,6 @@ import { Island } from '../prefabs/Island'
 export const DefaultScene = () => {
   const { controls } = useThree()
   const boatPos = useGameStore((s) => s.boatState)
-  const boatTarget = useGameStore((s) => s.boatTarget)
   const setBoatState = useGameStore((s) => s.setBoatState)
   const moveBoatToNextDock = useGameStore((s) => s.moveBoatToNextDock)
   const moveBoatToPrevDock = useGameStore((s) => s.moveBoatToPrevDock)
@@ -69,20 +68,24 @@ export const DefaultScene = () => {
       <ambientLight color={PRIMARY_COLOR} intensity={2} />
 
       <Water />
-      {islands.map((island, i) => (
-        <Island
-          key={i}
-          {...island}
-          index={i}
-          lighthouseRotation={island.lighthouseRotation}
-          showDockingPoint={true}
-        />
-      ))}
+      {islands
+        .filter(
+          (island) =>
+            Math.hypot(island.x - boatPos.x, island.y - boatPos.y) < 200, // adjust distance as needed
+        )
+        .map((island, i) => (
+          <Island
+            key={i}
+            {...island}
+            index={i}
+            lighthouseRotation={island.lighthouseRotation}
+            showDockingPoint={true}
+          />
+        ))}
       <Boat
         x={boatPos.x}
         y={boatPos.y}
         angle={boatPos.angle}
-        target={boatTarget}
         setBoatState={setBoatState}
       />
       <CameraControls
