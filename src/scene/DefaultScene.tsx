@@ -87,10 +87,10 @@ export const DefaultScene = () => {
       />
       <CameraControls
         makeDefault
-        mouseButtons={{ left: 1, middle: 16, right: 0, wheel: 16 }}
+        // mouseButtons={{ left: 1, middle: 16, right: 0, wheel: 16 }}
         minPolarAngle={0}
         maxPolarAngle={Math.PI / 2}
-        maxDistance={15}
+        maxDistance={35}
         minDistance={5}
       />
     </>

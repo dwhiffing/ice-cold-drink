@@ -57,7 +57,7 @@ function generateIslands({
           overrides[i]?.lighthouse.rotation?.y !== undefined
             ? { y: overrides[i].lighthouse.rotation.y }
             : { y: 0 },
-        dockingPoint: { dx: -3, dy: 0 },
+        dockingPoint: overrides[i]?.dockingPoint ?? { dx: 0, dy: 0 },
       })
     }
   }
@@ -207,6 +207,7 @@ export const useGameStore = create<GameState>((set, get) => {
           position: island.lighthousePosition,
           rotation: { y: island.lighthouseRotation?.y ?? 0 },
         },
+        dockingPoint: island.dockingPoint,
       }))
       console.log('Saving overrides:', positions)
       navigator.clipboard.writeText(JSON.stringify(positions, null, 2))

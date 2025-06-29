@@ -41,6 +41,22 @@ export function Island({
   const mode = useGameStore((s) => s.lighthouseEditMode)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChangeDockingPoint = (e: any) => {
+    if (!e || !e.target?.object?.position || !e.target?.object?.rotation) return
+    const pos = e.target.object.position
+    const newIslands = islands.map((island, i) =>
+      i === index
+        ? {
+            ...island,
+            dockingPoint: { dx: pos.x - x, dy: pos.z - y },
+          }
+        : island,
+    )
+
+    setIslands({ islands: newIslands })
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (e: any) => {
     if (!e || !e.target?.object?.position || !e.target?.object?.rotation) return
     const pos = e.target.object.position
@@ -94,21 +110,30 @@ export function Island({
 
   return (
     <>
-      <group position={[x, 0, y]}>
-        <mesh
-          geometry={geometry}
-          material={material}
-          rotation={[-Math.PI / 2, 0, 0]}
-          scale={[2, 2, 2]}
-        />
+      <mesh
+        geometry={geometry}
+        material={material}
+        position={[x, 0, y]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[2, 2, 2]}
+      />
 
-        {showDockingPoint && (
-          <mesh position={[dockingPoint.dx, 0, dockingPoint.dy]}>
-            <sphereGeometry args={[2, 16, 16]} />
-            <meshStandardMaterial color="yellow" />
+      {showDockingPoint && (
+        <TransformControls
+          position={[x + dockingPoint.dx, -0.5, y + dockingPoint.dy]}
+          mode="translate"
+          onMouseUp={handleChangeDockingPoint}
+          showX={true}
+          showY={false}
+          showZ={true}
+        >
+          <mesh>
+            <sphereGeometry args={[0.5, 16, 16]} />
+            <meshStandardMaterial color="orange" />
           </mesh>
-        )}
-      </group>
+        </TransformControls>
+      )}
+
       <TransformControls
         position={[x + lighthousePosition.x, 0, y + lighthousePosition.y]}
         rotation={[0, lighthouseRotation.y, 0]}

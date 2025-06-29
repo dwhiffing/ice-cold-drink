@@ -2,12 +2,16 @@
   {
     "lighthouse": {
       "position": {
-        "x": 0.047460399238445916,
-        "y": -0.015172596739752464
+        "x": -7.04149005643103,
+        "y": 16.48200064012926
       },
       "rotation": {
-        "y": -0.6836622046578625
+        "y": -0.6257778831497779
       }
+    },
+    "dockingPoint": {
+      "dx": -11.387518246615784,
+      "dy": 15.125577143529622
     }
   },
   {
@@ -19,6 +23,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -30,6 +38,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -41,6 +53,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -52,6 +68,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -63,6 +83,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -74,6 +98,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -85,6 +113,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -96,6 +128,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -107,6 +143,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -118,6 +158,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -129,6 +173,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -140,6 +188,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -151,6 +203,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -162,6 +218,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -173,6 +233,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -184,6 +248,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -195,6 +263,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -206,6 +278,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -217,6 +293,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -228,6 +308,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   },
   {
@@ -239,6 +323,10 @@
       "rotation": {
         "y": 0
       }
+    },
+    "dockingPoint": {
+      "dx": -3,
+      "dy": 0
     }
   }
 ]
