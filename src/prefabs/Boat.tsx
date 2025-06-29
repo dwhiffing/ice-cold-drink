@@ -1,8 +1,9 @@
 import { Float } from '@react-three/drei'
 import { useLoader, useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { MTLLoader, OBJLoader } from 'three/examples/jsm/Addons.js'
 import { useGameStore } from '../store/gameStore'
+import { BOAT_ROTATE_SPEED, BOAT_SPEED } from '../utils/constants'
 
 export const Boat = ({
   x,
@@ -26,6 +27,8 @@ export const Boat = ({
   const encounterModal = useGameStore((s) => s.encounterModal)
   const encounterTiming = useGameStore((s) => s.encounterTiming)
   const triggerEncounter = useGameStore((s) => s.triggerEncounter)
+  const isRotating = useRef(false)
+  const targetAngle = useRef(angle)
 
   function cubicBezierInterp(
     t: number,
@@ -57,10 +60,48 @@ export const Boat = ({
     state: Partial<{ bezierPath: null }>,
   ) => void
 
+  useEffect(() => {
+    if (bezierPath) {
+      const [bx, by] = cubicBezierInterp(
+        0.01,
+        bezierPath.start,
+        bezierPath.control1,
+        bezierPath.control2,
+        bezierPath.end,
+      )
+      const newTargetAngle = Math.atan2(bx - x, by - y) + Math.PI / 2
+      targetAngle.current = newTargetAngle
+      isRotating.current = true
+    }
+  }, [bezierPath])
+
   useFrame(() => {
     if (bezierPath) {
-      // Animate t from 0 to 1 based on speed
-      const speed = 0.001
+      if (isRotating.current) {
+        const rotationSpeed = BOAT_ROTATE_SPEED
+        let diff = targetAngle.current - stateRef.current.angle
+        diff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI
+        if (Math.abs(diff) < 0.01) {
+          stateRef.current.angle = targetAngle.current
+          setBoatState({
+            x: stateRef.current.x,
+            y: stateRef.current.y,
+            angle: targetAngle.current,
+          })
+          isRotating.current = false
+        } else {
+          stateRef.current.angle +=
+            Math.sign(diff) * Math.min(rotationSpeed, Math.abs(diff))
+          setBoatState({
+            x: stateRef.current.x,
+            y: stateRef.current.y,
+            angle: stateRef.current.angle,
+          })
+        }
+        return
+      }
+      if (isRotating.current) return
+      const speed = BOAT_SPEED
       if (encounterTiming !== null && tRef.current < 1) {
         if (
           tRef.current < encounterTiming &&
@@ -93,13 +134,15 @@ export const Boat = ({
         bezierPath.control2,
         bezierPath.end,
       )
-      const angle = Math.atan2(bx2 - bx, by2 - by) + Math.PI / 2
-      stateRef.current = { ...stateRef.current, x: bx, y: by, angle }
-      setBoatState({ x: bx, y: by, angle })
+      const _angle =
+        tRef.current >= 0.95
+          ? angle
+          : Math.atan2(bx2 - bx, by2 - by) + Math.PI / 2
+      stateRef.current = { ...stateRef.current, x: bx, y: by, angle: _angle }
+      setBoatState({ x: bx, y: by, angle: _angle })
       if (tRef.current >= 1) {
         tRef.current = 0
         setBezierPath({ bezierPath: null })
-        // Show destination modal when boat arrives
         useGameStore.getState().setShowDestinationModal(true)
       }
       return
