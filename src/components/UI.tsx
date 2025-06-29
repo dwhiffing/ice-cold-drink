@@ -3,20 +3,17 @@ import { useGameStore } from '../store/gameStore'
 
 const DURATION = 1000
 export const UI = ({ children }: { children: ReactNode }) => {
-  const currentDockingIndex = useGameStore((s) => s.currentDockingIndex)
   const inventory = useGameStore((s) => s.inventory)
 
   return (
     <div className="pointer-events-none absolute top-0 left-0 w-screen h-screen flex z-[100]">
       <div className="flex flex-col gap-1 text-white p-2">
-        <div className="font-bold">Inventory:</div>
         {inventory.map((item) => (
           <div key={item.name} className="text-sm">
             {item.name.charAt(0).toUpperCase() + item.name.slice(1)}:{' '}
             {item.value}
           </div>
         ))}
-        <div>Dock: {currentDockingIndex + 1}</div>
       </div>
 
       <DestinationModal />
@@ -103,12 +100,12 @@ export const DestinationModal = () => {
       destinationIslands.map(({ island, idx, distance }) => (
         <li key={idx} className="my-2">
           <button
-            className="px-4 py-2 rounded-md border-none bg-green-600 text-white font-bold cursor-pointer text-lg flex items-center gap-3 hover:bg-green-700 transition"
+            className="px-4 py-2 rounded-md border-none bg-green-600 text-white font-bold cursor-pointer text-lg flex items-center gap-1 hover:bg-green-700 transition"
             onClick={() => handleSelect(idx)}
           >
-            {island.name} ({idx + 1})
+            {island.name}
             <span className="font-normal text-base opacity-80">
-              ({Math.round(distance)} units)
+              {Math.round(distance / 100)} km
             </span>
           </button>
         </li>
@@ -141,9 +138,10 @@ export const DestinationModal = () => {
           >
             ×
           </button>
-          <h2 className="text-2xl font-bold mb-4">Select Destination Island</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            {islands[currentDockingIndex].name}
+          </h2>
           <div className="mb-4">
-            <div className="font-bold mb-2">Inventory Controls</div>
             {inventory
               .map((item) => item.name)
               .map((resource) => (
@@ -173,7 +171,8 @@ export const DestinationModal = () => {
                 </div>
               ))}
           </div>
-          <ul className="grid grid-cols-3 p-0 gap-4">{destinationListItems}</ul>
+          <h2 className="text-lg font-bold mb-2">Select Destination</h2>
+          <ul className="flex gap-4">{destinationListItems}</ul>
         </div>
       </div>
     </>
