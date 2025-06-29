@@ -1,6 +1,11 @@
 import { useCallback, useEffect } from 'react'
 import { Water } from '../prefabs/Water'
-import { DEBUG, FOG_DISTANCE, PRIMARY_COLOR } from '../utils/constants'
+import {
+  DEBUG,
+  FOG_DISTANCE,
+  NEIGHBOUR_DISTANCE,
+  PRIMARY_COLOR,
+} from '../utils/constants'
 import { Boat } from '../prefabs/Boat'
 import { CameraControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
@@ -70,7 +75,8 @@ export const DefaultScene = () => {
       {islands
         .filter(
           (island) =>
-            Math.hypot(island.x - boatPos.x, island.y - boatPos.y) < 200, // adjust distance as needed
+            Math.hypot(island.x - boatPos.x, island.y - boatPos.y) <
+            NEIGHBOUR_DISTANCE,
         )
         .map((island, i) => (
           <Island
@@ -91,7 +97,7 @@ export const DefaultScene = () => {
         // mouseButtons={{ left: 1, middle: 16, right: 0, wheel: 16 }}
         minPolarAngle={0}
         maxPolarAngle={Math.PI / 2}
-        maxDistance={35}
+        maxDistance={350}
         minDistance={5}
       />
 

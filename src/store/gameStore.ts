@@ -1,6 +1,11 @@
 import { create } from 'zustand'
 import overrides from '../overrides.json'
-import { DEBUG, ENCOUNTERS } from '../utils/constants'
+import {
+  DEBUG,
+  ENCOUNTERS,
+  FUEL_UNIT_DISTANCE,
+  NEIGHBOUR_DISTANCE,
+} from '../utils/constants'
 
 function mulberry32(seed: number) {
   return function () {
@@ -79,7 +84,9 @@ function generateIslands({
             : distance([island.x, island.y], [other.x, other.y]),
       }))
       .sort((a, b) => a.dist - b.dist)
-    island.neighbours = dists.filter((d) => d.dist < 200).map((d) => d.idx)
+    island.neighbours = dists
+      .filter((d) => d.dist < NEIGHBOUR_DISTANCE)
+      .map((d) => d.idx)
   })
   // Precompute cubic bezier curves for all neighbours
   islands.forEach((island, i) => {
@@ -174,7 +181,6 @@ export interface GameState {
   } | null
   inventory: { name: string; value: number }[]
   fuelDistanceTraveled: number
-  fuelUnitDistance: number
   moveBoatToDock: (index: number) => void
   setBoatState: (state: { x: number; y: number; angle: number }) => void
   lighthouseEditMode: 'translate' | 'rotate'
@@ -195,10 +201,10 @@ export interface GameState {
 }
 
 export const useGameStore = create<GameState>((set, get) => {
-  const count = 50
+  const count = 10
   const seed = 12345
-  const spread = 900
-  const buffer = 40
+  const spread = 1500
+  const buffer = 300
   const maxTries = 1000
   const drawDistance = 500
   const islands = generateIslands({ count, seed, spread, buffer, maxTries })
@@ -223,11 +229,10 @@ export const useGameStore = create<GameState>((set, get) => {
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
     showDestinationModal: false,
     inventory: [
-      { name: 'food', value: 5 },
+      // { name: 'food', value: 5 },
       { name: 'fuel', value: 5 },
     ],
     fuelDistanceTraveled: 0,
-    fuelUnitDistance: 50, // every 50 units, use 1 fuel
     gameStarted: DEBUG,
     encounterTiming: null,
     encounterModal: null,
@@ -244,6 +249,8 @@ export const useGameStore = create<GameState>((set, get) => {
       set({
         bezierPath: bezier,
         currentDockingIndex: index,
+        // TODO: re-enable encounters
+        // encounterTiming: Math.random() * 0.6 + 0.2,
       })
     },
     setBoatState: (state) => {
@@ -252,9 +259,8 @@ export const useGameStore = create<GameState>((set, get) => {
       let fuelDistanceTraveled = get().fuelDistanceTraveled + dist
       let inventory = get().inventory
       let fuelUsed = 0
-      const fuelUnitDistance = get().fuelUnitDistance
-      while (fuelDistanceTraveled >= fuelUnitDistance) {
-        fuelDistanceTraveled -= fuelUnitDistance
+      while (fuelDistanceTraveled >= FUEL_UNIT_DISTANCE) {
+        fuelDistanceTraveled -= FUEL_UNIT_DISTANCE
         fuelUsed++
       }
       if (fuelUsed > 0) {

@@ -1,6 +1,8 @@
-export const DEBUG = false
+export const DEBUG = true
 export const FOG_DISTANCE = 60
 export const DUR = 1000
+export const FUEL_UNIT_DISTANCE = 200
+export const NEIGHBOUR_DISTANCE = 600
 export const PRIMARY_COLOR = '#557582'
 
 export interface EncounterOption {
@@ -18,8 +20,8 @@ export const ENCOUNTERS: Encounter[] = [
     text: 'You find a floating crate. What do you do?',
     options: [
       {
-        label: 'Open it (gain food)',
-        onSelect: (store) => store.addToInventory('food', 2),
+        label: 'Open it (gain fuel)',
+        onSelect: (store) => store.addToInventory('fuel', 2),
       },
       { label: 'Ignore it', onSelect: () => {} },
     ],

@@ -90,9 +90,6 @@ export const DestinationModal = () => {
       setLocalShowDestinationModal(true)
       setTimeout(() => {
         moveBoatToDock(idx)
-        useGameStore.setState({
-          encounterTiming: Math.random() * 0.6 + 0.2,
-        })
       }, DURATION / 2)
     },
     [setShowDestinationModal, moveBoatToDock],
@@ -122,6 +119,12 @@ export const DestinationModal = () => {
 
   return (
     <>
+      <button
+        className="pointer-events-auto absolute top-4 right-4 px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
+        onClick={() => setLocalShowDestinationModal(true)}
+      >
+        Show Destinations
+      </button>
       <div
         className={`${
           isOpen ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
@@ -139,30 +142,34 @@ export const DestinationModal = () => {
           <h2 className="text-2xl font-bold mb-4">Select Destination Island</h2>
           <div className="mb-4">
             <div className="font-bold mb-2">Inventory Controls</div>
-            {['food', 'fuel'].map((resource) => (
-              <div
-                key={resource}
-                className="flex items-center justify-center gap-2 mb-2"
-              >
-                <span className="w-12 text-right capitalize">{resource}:</span>
-                <button
-                  className="px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
-                  onClick={() => subtractFromInventory(resource, 1)}
+            {inventory
+              .map((item) => item.name)
+              .map((resource) => (
+                <div
+                  key={resource}
+                  className="flex items-center justify-center gap-2 mb-2"
                 >
-                  -
-                </button>
-                <span className="w-8 text-center">
-                  {displayInventory.find((i) => i.name === resource)?.value ??
-                    0}
-                </span>
-                <button
-                  className="px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
-                  onClick={() => addToInventory(resource, 1)}
-                >
-                  +
-                </button>
-              </div>
-            ))}
+                  <span className="w-12 text-right capitalize">
+                    {resource}:
+                  </span>
+                  <button
+                    className="px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
+                    onClick={() => subtractFromInventory(resource, 1)}
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center">
+                    {displayInventory.find((i) => i.name === resource)?.value ??
+                      0}
+                  </span>
+                  <button
+                    className="px-2 py-1 bg-zinc-700 rounded hover:bg-zinc-600 text-lg font-bold"
+                    onClick={() => addToInventory(resource, 1)}
+                  >
+                    +
+                  </button>
+                </div>
+              ))}
           </div>
           <ul className="grid grid-cols-3 p-0 gap-4">{destinationListItems}</ul>
         </div>
