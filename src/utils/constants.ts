@@ -2,7 +2,7 @@ export const DEBUG = false
 export const FOG_DISTANCE = 60
 export const STARTING_ISLAND = 0
 export const STARTING_MONEY = 25
-export const STARTING_FUEL = 1000
+export const STARTING_FUEL = 10
 export let timescale = 1
 export const setTimescale = (v: number) => {
   timescale = v
