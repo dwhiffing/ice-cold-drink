@@ -78,8 +78,8 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
         return [x, 0.3, y]
       }).flat()
       curves.push(
-        <>
-          <line key={key}>
+        <React.Fragment key={key}>
+          <line>
             <bufferGeometry>
               <bufferAttribute
                 attach="attributes-position"
@@ -126,7 +126,7 @@ export const BezierRenderer: React.FC<BezierRendererProps> = ({ islands }) => {
             </bufferGeometry>
             <lineBasicMaterial color="purple" linewidth={2} />
           </line>
-        </>,
+        </React.Fragment>,
       )
       handles.push(
         <React.Fragment key={key + '-handles'}>
