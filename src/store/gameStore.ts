@@ -221,7 +221,7 @@ export const useGameStore = create<GameState>((set, get) => {
     currentDockingIndex: 0,
     bezierPath: null,
     lighthouseEditMode: 'translate' as 'translate' | 'rotate',
-    showDestinationModal: true,
+    showDestinationModal: false,
     inventory: [
       { name: 'food', value: 5 },
       { name: 'fuel', value: 5 },

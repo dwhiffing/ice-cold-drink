@@ -46,6 +46,14 @@ export const DefaultScene = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [lighthouseEditMode, setLighthouseEditMode, saveLighthousePositions])
 
+  useEffect(() => {
+    setTimeout(() => {
+      useGameStore.setState({
+        showDestinationModal: true,
+      })
+    }, 800)
+  }, [])
+
   return (
     <>
       <fog attach="fog" args={[PRIMARY_COLOR, 1, FOG_DISTANCE]} />
